@@ -1,0 +1,38 @@
+{
+  "name": "@opentui-app/core",
+  "version": "0.1.0",
+  "description": "App framework + design library for @opentui/solid terminal UIs",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./boot": "./src/boot/index.ts",
+    "./keyboard": "./src/keyboard/index.ts",
+    "./theme": "./src/theme/index.ts",
+    "./context": "./src/context/index.ts",
+    "./data": "./src/data/index.ts",
+    "./components": "./src/components/index.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./utils": "./src/utils/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "peerDependencies": {
+    "@opentui/core": "0.5.12",
+    "@opentui/solid": "0.5.12",
+    "solid-js": "1.9.12"
+  },
+  "dependencies": {
+    "@opentui/keymap": "0.5.12",
+    "marked": "^17.0.1"
+  },
+  "devDependencies": {
+    "@opentui/core": "0.5.12",
+    "@opentui/solid": "0.5.12",
+    "solid-js": "1.9.12"
+  }
+}

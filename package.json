@@ -1,0 +1,29 @@
+{
+  "name": "@opentui-app/monorepo",
+  "version": "0.1.0",
+  "description": "An app framework + design library for @opentui/solid terminal UIs",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p packages/core/tsconfig.json && tsc -p apps/example/tsconfig.json && tsc -p apps/ghdash-tui/tsconfig.json",
+    "test": "bun test",
+    "dev:example": "bun run --cwd apps/example dev",
+    "dev:ghdash": "bun run --cwd apps/ghdash-tui dev",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "25.2.0",
+    "oxfmt": "0.70.0",
+    "oxlint": "1.85.0",
+    "oxlint-tsgolint": "7.0.2003",
+    "typescript": "5.9.3"
+  }
+}

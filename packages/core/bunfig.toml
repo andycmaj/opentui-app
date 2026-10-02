@@ -1,0 +1,4 @@
+# See the repo root bunfig.toml. Needed so `bun test` run from this package
+# picks up the Solid transform too.
+[test]
+preload = ["./test/solid-preload.ts"]

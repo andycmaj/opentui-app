@@ -1,0 +1,21 @@
+{
+  "name": "@opentui-app/example",
+  "version": "0.1.0",
+  "description": "Minimal demo app for @opentui-app/core",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --conditions=browser --preload @opentui/solid/preload ./src/index.tsx",
+    "debug": "SHOW_CONSOLE=true bun run --inspect-wait --conditions=browser --preload @opentui/solid/preload ./src/index.tsx",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "dependencies": {
+    "@opentui-app/core": "workspace:*",
+    "@opentui/core": "0.5.12",
+    "@opentui/solid": "0.5.12",
+    "solid-js": "1.9.12"
+  }
+}

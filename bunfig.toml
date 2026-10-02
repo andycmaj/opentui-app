@@ -1,0 +1,13 @@
+# No global `preload` here on purpose.
+#
+# A global preload runs for every `bun run`, including plain utility scripts
+# that never touch Solid. Loading @opentui/solid/preload for those pulls in the
+# Babel JSX transform and can crash unrelated scripts. The paths that actually
+# need the Solid transform opt in themselves: the `dev`/`debug` scripts pass
+# `--preload @opentui/solid/preload`, and a build script would register the
+# Solid plugin directly via Bun.build.
+
+# `bun test` does need the Solid transform for component tests; scoping it to
+# [test] keeps plain `bun run` scripts free of it.
+[test]
+preload = ["./packages/core/test/solid-preload.ts"]

@@ -1,0 +1,2 @@
+# No global preload — see the repo root bunfig.toml for why. The dev/debug
+# scripts pass `--preload @opentui/solid/preload` themselves.
