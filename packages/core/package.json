@@ -1,8 +1,21 @@
 {
-  "name": "@opentui-app/core",
+  "name": "@andycmaj/opentui-app",
   "version": "0.1.0",
   "description": "App framework + design library for @opentui/solid terminal UIs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andycmaj/opentui-app.git",
+    "directory": "packages/core"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
+  "files": [
+    "src",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./boot": "./src/boot/index.ts",
@@ -15,11 +28,13 @@
     "./utils": "./src/utils/index.ts"
   },
   "scripts": {
+    "build": "bun run script/build.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "lint": "oxlint",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "version:bump": "bun run script/version.ts"
   },
   "peerDependencies": {
     "@opentui/core": "0.5.12",

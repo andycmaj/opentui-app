@@ -1,6 +1,6 @@
 // App commands: the framework's base commands plus this app's own.
 
-import { BaseCommands } from "@opentui-app/core";
+import { BaseCommands } from "@andycmaj/opentui-app";
 
 export const Commands = {
   ...BaseCommands,

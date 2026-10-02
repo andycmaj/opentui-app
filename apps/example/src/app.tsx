@@ -20,7 +20,7 @@ import {
   useToast,
   type PaletteAction,
   type ThemeName,
-} from "@opentui-app/core";
+} from "@andycmaj/opentui-app";
 import { Commands } from "./commands";
 import { keymap, PANES } from "./keymap";
 import { createTaskDataSource } from "./data";
@@ -175,7 +175,7 @@ function AppContent(props: AppContentProps) {
           onClose={closeModal}
           scopeLabels={{ app: "Global", list: "Task List", detail: "Detail" }}
           scopeOrder={["app", "list", "detail"]}
-          footer="@opentui-app/core demo"
+          footer="@andycmaj/opentui-app demo"
         />
       </Show>
     </box>

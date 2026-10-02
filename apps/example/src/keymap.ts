@@ -4,7 +4,7 @@ import {
   baseAppBindings,
   navBindings,
   type KeymapTable,
-} from "@opentui-app/core";
+} from "@andycmaj/opentui-app";
 import { Commands } from "./commands";
 
 export const PANES = ["list", "detail"];

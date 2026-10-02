@@ -9,10 +9,9 @@
     "apps/*"
   ],
   "scripts": {
-    "typecheck": "tsc -p packages/core/tsconfig.json && tsc -p apps/example/tsconfig.json && tsc -p apps/ghdash-tui/tsconfig.json",
+    "typecheck": "tsc -p packages/core/tsconfig.json && tsc -p apps/example/tsconfig.json",
     "test": "bun test",
     "dev:example": "bun run --cwd apps/example dev",
-    "dev:ghdash": "bun run --cwd apps/ghdash-tui dev",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",

@@ -2,7 +2,7 @@
 // without any network or Effection dependency, proving an app can plug its own
 // (here trivial) fetching mechanism behind the interface.
 
-import { createAsyncState, type DataSource } from "@opentui-app/core";
+import { createAsyncState, type DataSource } from "@andycmaj/opentui-app";
 
 export type TaskStatus = "active" | "done" | "blocked";
 
