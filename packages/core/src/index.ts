@@ -1,4 +1,4 @@
-// @opentui-app/core — app framework + design library for @opentui/solid TUIs.
+// @andycmaj/opentui-app — app framework + design library for @opentui/solid TUIs.
 
 export * from "./boot";
 export * from "./keyboard";

@@ -1,8 +1,9 @@
-# Agent notes for @opentui-app
+# Agent notes for @andycmaj/opentui-app
 
-A Bun workspace monorepo: `packages/core` (the `@opentui-app/core` library) and
+A Bun workspace monorepo: `packages/core` (the `@andycmaj/opentui-app` library) and
 `apps/example` (a demo consuming it). The library was extracted from three
-sibling TUIs (`~/dev/tilt-tui-root`, `~/dev/dotsync`, `~/dev/ghdash-tui`); those
+sibling TUIs (`~/dev/tilt-tui-root`, `~/dev/dotsync`, `ghdash-tui`, now [its own repo](https://github.com/andycmaj/ghdash-tui)
+consuming the published package); those
 remain the reference for conventions.
 
 ## Runtime & tooling
@@ -41,7 +42,7 @@ bun run dev:example      # drive the TUI; test via `tmux capture-pane`
 ## Adding a new app
 
 1. Create `apps/<name>` with a `package.json` depending on
-   `"@opentui-app/core": "workspace:*"` plus the `@opentui/*` + `solid-js` peers,
+   `"@andycmaj/opentui-app": "workspace:*"` plus the `@opentui/*` + `solid-js` peers,
    a `tsconfig.json` extending `../../tsconfig.base.json` (add its own `@/*`
    path), and a `bunfig.toml` with no global preload.
 2. `src/index.tsx`: `await runApp(() => <App />)`.

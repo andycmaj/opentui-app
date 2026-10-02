@@ -17,7 +17,7 @@ import {
   useTheme,
   type Theme,
   type ThemeColor,
-} from "@opentui-app/core";
+} from "@andycmaj/opentui-app";
 import { Commands } from "../commands";
 import type { Task, TaskStatus } from "../data";
 

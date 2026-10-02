@@ -1,7 +1,7 @@
 {
   "name": "@opentui-app/example",
   "version": "0.1.0",
-  "description": "Minimal demo app for @opentui-app/core",
+  "description": "Minimal demo app for @andycmaj/opentui-app",
   "type": "module",
   "private": true,
   "scripts": {
@@ -13,7 +13,7 @@
     "format:check": "oxfmt --check"
   },
   "dependencies": {
-    "@opentui-app/core": "workspace:*",
+    "@andycmaj/opentui-app": "workspace:*",
     "@opentui/core": "0.5.12",
     "@opentui/solid": "0.5.12",
     "solid-js": "1.9.12"

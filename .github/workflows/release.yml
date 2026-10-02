@@ -1,0 +1,102 @@
+name: Release
+run-name: "release ${{ inputs.version || inputs.bump }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Bump major, minor, or patch"
+        required: false
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      version:
+        description: "Override version (optional, e.g. 1.2.3)"
+        required: false
+        type: string
+
+concurrency: ${{ github.workflow }}
+
+permissions:
+  contents: write
+
+jobs:
+  # Gate the release on the checks; nothing gets tagged or published if these fail.
+  check:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun test
+
+  version:
+    needs: check
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup git committer
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - id: version
+        working-directory: packages/core
+        run: bun run script/version.ts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENTUI_APP_BUMP: ${{ inputs.bump }}
+          OPENTUI_APP_VERSION: ${{ inputs.version }}
+
+  publish:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.version.outputs.tag }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      # The package has no README of its own; ship the repo README to npm.
+      - run: cp README.md packages/core/README.md
+
+      # Compile to dist/ and point exports at it (see script/build.ts for why
+      # src/ can't be published as-is).
+      - name: Build
+        working-directory: packages/core
+        run: bun run script/build.ts --publish
+
+      - name: Publish to npm
+        working-directory: packages/core
+        run: bun publish --access public
+        env:
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ needs.version.outputs.tag }}" --draft=false
