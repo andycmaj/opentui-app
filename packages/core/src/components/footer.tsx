@@ -1,7 +1,7 @@
 // Context-aware keybinding hints, generated from the keymap for the active
 // pane. Collapses to just the "help" hint when the content area is narrow.
 
-import { createMemo, For } from "solid-js";
+import { createMemo, For, Show, type JSX } from "solid-js";
 import { useTerminalDimensions } from "@opentui/solid";
 import { useTheme } from "../theme";
 import { useFocus } from "../context/focus";
@@ -12,6 +12,10 @@ interface FooterProps {
   sidebarWidth?: number;
   // Below this content width, only the "help" hint is shown (default 80).
   narrowThreshold?: number;
+  // Right-aligned slot (e.g. an update notice).
+  right?: JSX.Element;
+  // Columns the right slot occupies, counted against the narrow threshold.
+  rightWidth?: number;
 }
 
 export function Footer(props: FooterProps) {
@@ -30,7 +34,8 @@ export function Footer(props: FooterProps) {
 
   const helpItems = createMemo(() => {
     const items = allHelpItems();
-    if (contentWidth() < (props.narrowThreshold ?? 80)) {
+    const available = contentWidth() - (props.rightWidth ?? 0);
+    if (available < (props.narrowThreshold ?? 80)) {
       return items.filter((item) => item.text === "help");
     }
     return items;
@@ -57,6 +62,7 @@ export function Footer(props: FooterProps) {
           )}
         </For>
       </box>
+      <Show when={props.right}>{props.right}</Show>
     </box>
   );
 }

@@ -108,6 +108,23 @@ export function getScopeBindings<Ctx>(
   }));
 }
 
+export interface HelpRow {
+  keys: string;
+  desc: string;
+}
+
+// One row per command, its keys joined in binding order ("j/down"), for the
+// keyboard-help modal.
+export function mergeByCommand(bindings: HelpBinding[]): HelpRow[] {
+  const rows = new Map<Command, HelpRow>();
+  for (const binding of bindings) {
+    const row = rows.get(binding.cmd);
+    if (row) row.keys += `/${binding.keys}`;
+    else rows.set(binding.cmd, { keys: binding.keys, desc: binding.desc });
+  }
+  return [...rows.values()];
+}
+
 // Drop bindings whose `relevant` predicate rejects the given context.
 // Bindings without a predicate are always relevant.
 export function filterRelevant<Ctx>(

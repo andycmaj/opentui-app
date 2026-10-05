@@ -13,11 +13,13 @@ export {
   formatStroke,
   getHelpItems,
   getScopeBindings,
+  mergeByCommand,
   parseKey,
   reachableBindings,
   type HelpBinding,
   type HelpItem,
   type HelpItemOptions,
+  type HelpRow,
   type KeyStroke,
 } from "./keymap-utils";
 export {
