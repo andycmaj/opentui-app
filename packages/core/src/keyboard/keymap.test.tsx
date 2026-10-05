@@ -89,6 +89,9 @@ function ContentPane(props: { log: string[] }) {
   );
 }
 
+// Whether the modal's space handler acts or declines the key.
+let spaceToggles = false;
+
 function Shell(props: { harness: (h: Harness) => void; ctx: () => Ctx }) {
   const log: string[] = [];
   const focus = useFocus();
@@ -125,9 +128,17 @@ function Shell(props: { harness: (h: Harness) => void; ctx: () => Ctx }) {
       <Show when={focus.activeModal() === "palette"}>
         <Modal
           onClose={focus.closeModal}
-          bindings={modalNavBindings}
+          bindings={[
+            ...modalNavBindings,
+            { key: "space", cmd: "modal.toggle", desc: "toggle" },
+          ]}
           commands={{
             [ModalCommands.MODAL_SELECT]: () => log.push("modal:select"),
+            "modal.toggle": () => {
+              if (!spaceToggles) return false;
+              log.push("modal:toggle");
+              return true;
+            },
           }}
         >
           <ModalFilterInput onInput={() => {}} ref={(r) => (input = r)} />
@@ -138,7 +149,10 @@ function Shell(props: { harness: (h: Harness) => void; ctx: () => Ctx }) {
 }
 
 let destroy: (() => void) | undefined;
-afterEach(() => destroy?.());
+afterEach(() => {
+  destroy?.();
+  spaceToggles = false;
+});
 
 async function setup(ctx: () => Ctx = () => ({ editable: false })) {
   let harness: Harness | undefined;
@@ -204,6 +218,20 @@ describe("keymap + focus", () => {
     await settle();
     expect(h.log).toEqual([]);
     expect(h.input()?.value).toBe("qj");
+  });
+
+  test("a handler returning false declines the key so the input still gets it", async () => {
+    const { h, t, press, settle } = await setup();
+    await press(":");
+    await t.mockInput.typeText("a b");
+    await settle();
+    expect(h.input()?.value).toBe("a b");
+    expect(h.log).toEqual([]);
+
+    spaceToggles = true;
+    await press(" ");
+    expect(h.log).toEqual(["modal:toggle"]);
+    expect(h.input()?.value).toBe("a b");
   });
 
   test("the modal's return shadows the pane's return", async () => {

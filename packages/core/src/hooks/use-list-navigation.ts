@@ -14,6 +14,9 @@ interface ListNavigationOptions {
   itemHeight?: number;
   // Max visible items before scrolling (default 10).
   visibleItems?: number;
+  // Row an item starts at, for lists with interleaved non-item rows (group
+  // headers). Defaults to index * itemHeight.
+  rowOf?: (index: number) => number;
 }
 
 interface ListNavigationResult {
@@ -55,10 +58,11 @@ export function useListNavigation(
     const scrollRef = options.scrollRef();
     if (scrollRef) {
       const scrollTop = scrollRef.scrollTop;
-      const itemTop = next * itemHeight;
+      const itemTop = options.rowOf?.(next) ?? next * itemHeight;
 
-      if (itemTop < scrollTop) {
-        scrollRef.scrollTo(itemTop);
+      // Wrapping to the first item scrolls fully up so a leading header shows.
+      if (next === 0 || itemTop < scrollTop) {
+        scrollRef.scrollTo(next === 0 ? 0 : itemTop);
       } else if (itemTop >= scrollTop + visibleItems) {
         scrollRef.scrollTo(itemTop - visibleItems + 1);
       }

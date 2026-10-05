@@ -4,6 +4,7 @@ import {
   formatKey,
   getHelpItems,
   getScopeBindings,
+  mergeByCommand,
   parseKey,
   type HelpBinding,
 } from "./keymap-utils";
@@ -43,6 +44,22 @@ describe("getScopeBindings", () => {
     const tree = getScopeBindings(table, "tree");
     expect(tree.map((b) => b.keys)).toContain("G");
     expect(getScopeBindings(table, "missing")).toEqual([]);
+  });
+});
+
+describe("mergeByCommand", () => {
+  test("folds keys that share a command into one row, first desc wins", () => {
+    const table: KeymapTable = { app: baseAppBindings, list: navBindings() };
+    expect(mergeByCommand(getScopeBindings(table, "list")).slice(0, 2)).toEqual(
+      [
+        { keys: "j/down", desc: "down" },
+        { keys: "k/up", desc: "up" },
+      ],
+    );
+    expect(mergeByCommand(getScopeBindings(table, "app"))[0]).toEqual({
+      keys: "^p/:",
+      desc: "palette",
+    });
   });
 });
 

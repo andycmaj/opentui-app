@@ -2,14 +2,14 @@
 // groups the bindings by scope, so it stays a single source of truth with the
 // footer and palette.
 
-import { createMemo, For, Show } from "solid-js";
+import { createMemo, For, Match, Switch, type JSX } from "solid-js";
 import type { ScrollBoxRenderable } from "@opentui/core";
 import { TextAttributes } from "@opentui/core";
 import { useTheme } from "../theme";
-import { BaseCommands } from "../keyboard/commands";
-import { navBindings, type Scope } from "../keyboard/keymap";
+import { BaseCommands, ModalCommands } from "../keyboard/commands";
+import { navBindings, type BindingSpec, type Scope } from "../keyboard/keymap";
 import { useKeymapTable } from "../keyboard/keymap-context";
-import { getScopeBindings } from "../keyboard/keymap-utils";
+import { getScopeBindings, mergeByCommand } from "../keyboard/keymap-utils";
 import { Modal, ModalHeader } from "./modal";
 
 interface KeyboardHelpProps {
@@ -18,8 +18,15 @@ interface KeyboardHelpProps {
   scopeLabels?: Record<string, string>;
   // Explicit section order; defaults to "app" first, then table order.
   scopeOrder?: Scope[];
-  footer?: string;
+  // A string renders as muted text; pass an element for richer content.
+  footer?: JSX.Element;
 }
+
+// The keys that open help also close it, alongside escape.
+const CLOSE_BINDINGS: BindingSpec[] = [
+  { key: "?", cmd: ModalCommands.MODAL_CLOSE, desc: "close" },
+  { key: "q", cmd: ModalCommands.MODAL_CLOSE, desc: "close" },
+];
 
 function titleCase(scope: string): string {
   if (scope === "app") return "Global";
@@ -43,10 +50,7 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
       .map((scope) => ({
         scope,
         title: props.scopeLabels?.[scope] ?? titleCase(scope),
-        items: getScopeBindings(table, scope).map((b) => ({
-          key: b.keys,
-          description: b.desc,
-        })),
+        items: mergeByCommand(getScopeBindings(table, scope)),
       }));
   });
 
@@ -56,7 +60,7 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
     <Modal
       size="md"
       onClose={props.onClose}
-      bindings={navBindings()}
+      bindings={[...navBindings(), ...CLOSE_BINDINGS]}
       commands={{
         [BaseCommands.NAV_DOWN]: () => scrollRef?.scrollBy(1),
         [BaseCommands.NAV_UP]: () => scrollRef?.scrollBy(-1),
@@ -66,7 +70,7 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
         [BaseCommands.SCROLL_PAGEUP]: () => scrollRef?.scrollBy(-page()),
       }}
     >
-      <ModalHeader title="Keyboard Shortcuts" hint="j/k scroll · esc" />
+      <ModalHeader title="Keyboard Shortcuts" hint="j/k scroll · esc/q/?" />
       <scrollbox
         ref={(r: ScrollBoxRenderable) => (scrollRef = r)}
         maxHeight={16}
@@ -84,9 +88,9 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
                 {(item) => (
                   <box flexDirection="row">
                     <box width={12} flexShrink={0}>
-                      <text fg={theme.primary}>{item.key}</text>
+                      <text fg={theme.primary}>{item.keys}</text>
                     </box>
-                    <text fg={theme.textMuted}>{item.description}</text>
+                    <text fg={theme.textMuted}>{item.desc}</text>
                   </box>
                 )}
               </For>
@@ -94,11 +98,20 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
           )}
         </For>
       </scrollbox>
-      <Show when={props.footer}>
-        <box paddingLeft={2} paddingRight={2} paddingBottom={1}>
-          <text fg={theme.textMuted}>{props.footer}</text>
-        </box>
-      </Show>
+      <Switch>
+        <Match when={typeof props.footer === "string" && props.footer}>
+          {(text) => (
+            <box paddingLeft={2} paddingRight={2} paddingBottom={1}>
+              <text fg={theme.textMuted}>{text()}</text>
+            </box>
+          )}
+        </Match>
+        <Match when={props.footer}>
+          <box paddingLeft={2} paddingRight={2} paddingBottom={1}>
+            {props.footer}
+          </box>
+        </Match>
+      </Switch>
     </Modal>
   );
 }

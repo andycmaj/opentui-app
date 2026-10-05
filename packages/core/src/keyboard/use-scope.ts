@@ -7,7 +7,9 @@ import type { Command } from "./commands";
 import type { BindingSpec, Scope } from "./keymap";
 import { useKeymapTable } from "./keymap-context";
 
-export type CommandHandlers = Partial<Record<Command, () => void>>;
+// A handler may return exactly false to decline the key, letting it fall
+// through to lower layers or the focused renderable (e.g. a text input).
+export type CommandHandlers = Partial<Record<Command, () => unknown>>;
 
 export interface ScopeOptions {
   // Layer is active while focus is within this renderable. Omit for a global
@@ -41,7 +43,7 @@ export function useScope(
     name,
     title: specs.find((spec) => spec.cmd === name)?.desc,
     run() {
-      handler?.();
+      return handler?.() === false ? false : undefined;
     },
   }));
 

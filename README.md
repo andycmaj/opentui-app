@@ -143,14 +143,25 @@ identity-based, so two copies means `useRenderer()` in app code can't see the
 provider the framework's `render()` installed ("No renderer found"). Installing
 from the registry gets this for free; a `file:` symlink to `packages/core` does
 **not**, because the symlink's peers resolve from _this_ repo's `node_modules`.
-To test unreleased framework changes in a consumer, install a packed tarball:
+To test unreleased framework changes in a consumer, install a packed tarball
+built the way the release does. Packing `src/` as-is doesn't work:
+`@opentui/solid`'s Bun plugin skips `node_modules`, so the installed `.tsx`
+gets React-style JSX and every context provider renders its children outside
+the provider. `build.ts --publish` compiles to `dist/` and rewrites
+`package.json` in place, so restore it afterwards:
 
 ```sh
-cd packages/core && bun pm pack --destination /path/to/app/.vendor
+cd packages/core
+bun run script/build.ts --publish
+bun pm pack --destination /path/to/app/.vendor
+git checkout package.json && rm -rf dist
 # in the consuming app:
 #   "@andycmaj/opentui-app": "file:.vendor/andycmaj-opentui-app-<version>.tgz"
 bun install
 ```
+
+Bun caches a `file:` tarball by name, so after repacking the same version,
+`bun remove` and re-`bun add` it to pick up the new build.
 
 ## Releasing
 
