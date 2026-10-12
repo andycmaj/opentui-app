@@ -16,3 +16,4 @@ export {
 export { CommandPalette, type PaletteAction } from "./command-palette";
 export { KeyboardHelp } from "./keyboard-help";
 export { Markdown, InlineSpans, decodeEntities, stripTags } from "./markdown";
+export * from "./log-view";
