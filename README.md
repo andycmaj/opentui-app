@@ -16,16 +16,17 @@ apps/example       a minimal two-pane demo consuming the library
 
 ## What the library gives you
 
-| Area           | Exports                                                                                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Boot**       | `runApp` (render + ErrorBoundary + process handlers), `emergencyExit`                                                                                        |
-| **Keyboard**   | `BaseCommands`, `baseAppBindings`, `navBindings`, `modalNavBindings`, `useScope`, `KeymapProvider` (on `@opentui/keymap`), help/footer derivations           |
-| **Theme**      | `ThemeProvider`, `useTheme`, four terminal-adaptive themes, `getModalTheme`, color math, `focusBorder`                                                       |
-| **Context**    | `FocusProvider` + `usePane` (real-focus panes/sidebar/modal), `ToastProvider`, `createRequiredContext`                                                       |
-| **Data**       | `DataSource<T>` seam, `createAsyncState`, `makeGuard` (unopinionated — bring your own fetching)                                                              |
-| **Components** | `Modal`/`ModalHeader`/`ModalFilterInput`, `CommandPalette`, `KeyboardHelp`, `StatusIndicator`, `Footer`, `PaneHeader`, `Card`, `Toast`, `Marker`, `Markdown` |
-| **Hooks**      | `useListNavigation` (filterable), `useListCursor` (in-place cursor)                                                                                          |
-| **Utils**      | `openUrl`, `copyToClipboard` (cross-platform incl. WSL), `createConfigStore`, `truncate`                                                                     |
+| Area           | Exports                                                                                                                                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Boot**       | `runApp` (render + ErrorBoundary + process handlers), `emergencyExit`                                                                                                                                      |
+| **Keyboard**   | `BaseCommands`, `baseAppBindings`, `navBindings`, `modalNavBindings`, `useScope`, `useKeyPassthrough` (raw keys to an embedded terminal), `KeymapProvider` (on `@opentui/keymap`), help/footer derivations |
+| **Theme**      | `ThemeProvider`, `useTheme`, four terminal-adaptive themes, `getModalTheme`, color math, `focusBorder`                                                                                                     |
+| **Context**    | `FocusProvider` + `usePane` (real-focus panes/sidebar/modal), `ToastProvider`, `createRequiredContext`                                                                                                     |
+| **Data**       | `DataSource<T>` seam, `createAsyncState`, `makeGuard` (unopinionated — bring your own fetching)                                                                                                            |
+| **Components** | `Modal`/`ModalHeader`/`ModalFilterInput`, `CommandPalette`, `KeyboardHelp`, `StatusIndicator`, `Footer`, `PaneHeader`, `Card`, `Toast`, `Marker`, `Markdown`                                               |
+| **Log view**   | `LogBufferView` (virtual-scrolled, wrapped, ANSI, search, mouse select-to-copy), the `LogSource` seam, `createMemoryLogSource`                                                                             |
+| **Hooks**      | `useListNavigation` (filterable), `useListCursor` (in-place cursor)                                                                                                                                        |
+| **Utils**      | `openUrl`, `copyToClipboard` (cross-platform incl. WSL), `createConfigStore`, `truncate`, `parseAnsi`/`stripAnsi`/`displayWidth`                                                                           |
 
 ## Quick start
 
@@ -125,7 +126,7 @@ bun run format          # oxfmt
 ```
 
 The demo exercises every primitive: two panes, cursor nav (`j`/`k`/`g`/`G`),
-`Tab` pane cycling, `Ctrl-E` sidebar toggle, `:` command palette, `?` help, `r`
+`Tab` pane cycling, `l` in the detail pane for a streaming `LogBufferView`, `Ctrl-E` sidebar toggle, `:` command palette, `?` help, `r`
 refresh toast, and `t` to cycle all four themes.
 
 ## Consuming from another repo

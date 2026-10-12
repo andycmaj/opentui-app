@@ -7,4 +7,5 @@ export const Commands = {
   ITEM_OPEN: "item.open",
   THEME_CYCLE: "theme.cycle",
   REFRESH: "data.refresh",
+  ACTIVITY_TOGGLE: "detail.activity.toggle",
 } as const;

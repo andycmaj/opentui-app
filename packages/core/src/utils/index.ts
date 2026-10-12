@@ -7,3 +7,10 @@ export {
   type ConfigStore,
   type ConfigStoreOptions,
 } from "./config-store";
+export {
+  parseAnsi,
+  stripAnsi,
+  displayWidth,
+  sliceByDisplayPosition,
+  type AnsiSegment,
+} from "./ansi-parser";

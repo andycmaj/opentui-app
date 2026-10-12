@@ -19,5 +19,13 @@ export const keymap: KeymapTable = {
     ...navBindings(),
     { key: "return", cmd: Commands.ITEM_OPEN, desc: "open task", help: "open" },
   ],
-  detail: navBindings(),
+  detail: [
+    ...navBindings(),
+    {
+      key: "l",
+      cmd: Commands.ACTIVITY_TOGGLE,
+      desc: "toggle activity log",
+      help: "activity",
+    },
+  ],
 };

@@ -35,3 +35,7 @@ export {
   type ScopeOptions,
 } from "./use-scope";
 export { useHelpItems, useReachableBindings } from "./use-help-items";
+export {
+  useKeyPassthrough,
+  type KeyPassthroughOptions,
+} from "./use-key-passthrough";
