@@ -7,7 +7,11 @@
 // - Auto-scroll (follow) mode
 // - Search filtering with match highlighting
 
-import { displayWidth } from "../../utils/ansi-parser";
+import {
+  cellWidth,
+  displayWidth,
+  sanitizeControlChars,
+} from "../../utils/ansi-parser";
 import type { LogLine } from "./log-source";
 
 /**
@@ -534,7 +538,10 @@ export class LogBuffer {
    */
   private wrapLine(line: LogLine): string[] {
     const prefix = this.getLinePrefix(line);
-    const text = line.text;
+    // Sanitized here so wrapping, match ranges, selection and drawing all
+    // measure the same text. Tab stops are relative to the log text, not the
+    // timestamp prefix.
+    const text = sanitizeControlChars(line.text);
     const fullLine = prefix + text;
 
     // Reserve 1 char for scrollbar
@@ -582,8 +589,10 @@ export class LogBuffer {
     let lastCharIndex = 0;
     let inEscape = false;
 
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
+    for (let i = 0; i < text.length;) {
+      const char = String.fromCodePoint(text.codePointAt(i)!);
+      const charIndex = i;
+      i += char.length;
 
       // Handle ANSI escape sequences - don't count them in width
       if (char === "\x1B") {
@@ -598,18 +607,25 @@ export class LogBuffer {
         continue;
       }
 
-      // We've exceeded the width, stop here
-      if (currentWidth >= maxWidth) {
+      const width = cellWidth(char);
+      // Adding this char would exceed the width, stop here
+      if (currentWidth + width > maxWidth) {
         break;
       }
 
       // Track word boundaries
       if (char === " ") {
-        breakPoint = i;
+        breakPoint = charIndex;
       }
 
-      currentWidth++;
-      lastCharIndex = i + 1;
+      currentWidth += width;
+      lastCharIndex = i;
+    }
+
+    // A wide char that alone exceeds maxWidth still has to be emitted, or the
+    // caller's wrap loop never makes progress.
+    if (lastCharIndex === 0) {
+      lastCharIndex = String.fromCodePoint(text.codePointAt(0)!).length;
     }
 
     // If no space found or space is at start, fall back to character wrap
