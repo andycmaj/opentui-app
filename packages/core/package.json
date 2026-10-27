@@ -42,6 +42,7 @@
     "solid-js": "1.9.12"
   },
   "dependencies": {
+    "@ansi-tools/parser": "^1.1.0",
     "@opentui/keymap": "0.5.12",
     "marked": "^17.0.1"
   },

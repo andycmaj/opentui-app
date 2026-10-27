@@ -38,7 +38,7 @@ import {
   type MatchRange,
   type LogSearchFilter,
 } from "./log-buffer";
-import { parseAnsi } from "../../utils/ansi-parser";
+import { cellWidth, parseAnsi } from "../../utils/ansi-parser";
 import { copyToClipboard } from "../../utils/copy-to-clipboard";
 import { defaultTheme, type ThemeColor } from "../../theme/theme";
 import { useTheme } from "../../theme/context";
@@ -670,8 +670,14 @@ export function LogBufferView(
       }
 
       for (const char of segment.text) {
+        const width = cellWidth(char);
+        // Zero-width joiners/selectors would overwrite the previous cell
+        if (width === 0) {
+          textPos += char.length;
+          continue;
+        }
         // Reserve rightmost column for scrollbar
-        if (x >= maxWidth - 1) break;
+        if (x + width > maxWidth - 1) break;
 
         // Check if this character is in selection range (takes priority)
         const inSelection = isInSelectionRange(x, selectionRange ?? null);
@@ -689,9 +695,12 @@ export function LogBufferView(
           cellBg = c.highlightBg;
         }
 
-        fb.setCell(x, y, char, cellFg, cellBg);
-        x++;
-        textPos++;
+        // setCell doesn't register wide graphemes, leaving the cells blank;
+        // drawText goes through opentui's grapheme handling.
+        fb.drawText(char, x, y, cellFg, cellBg);
+        x += width;
+        // Match ranges are string indices, so advance by UTF-16 length
+        textPos += char.length;
       }
     }
   }
