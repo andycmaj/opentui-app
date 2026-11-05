@@ -17,12 +17,12 @@ const pages = [
 <Base title="framework" section="framework">
   <Pane slot="sidebar" variant="sidebar" as="nav" aria-label="Framework docs">
     <PaneHeader title="framework" />
-    <ul class="docs-nav">
+    <ul class="docs-nav" data-nav-list>
       {
         pages.map((page) => (
           <li>
             <Marker selected={page.current} />
-            <a href={page.href} aria-current={page.current ? "page" : undefined}>
+            <a href={page.href} data-nav-item aria-current={page.current ? "page" : undefined}>
               {page.label}
             </a>
           </li>
@@ -53,6 +53,11 @@ const pages = [
   }
   .docs-nav a {
     color: var(--text);
+  }
+  .docs-nav a:focus-visible {
+    outline: none;
+    background: var(--sel-bg);
+    color: var(--sel-fg);
   }
   .docs-nav a[aria-current="page"] {
     color: var(--primary);

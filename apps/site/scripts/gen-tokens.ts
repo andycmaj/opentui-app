@@ -11,7 +11,11 @@ import {
   type Theme,
 } from "../../../packages/core/src/theme/theme";
 import { SITE_THEMES } from "../src/themes";
-import { elevate, mix } from "../../../packages/core/src/theme/color";
+import {
+  contrastingForeground,
+  elevate,
+  mix,
+} from "../../../packages/core/src/theme/color";
 
 type Palette = Record<keyof Theme, string>;
 
@@ -149,6 +153,9 @@ function block(selector: string, palette: Palette, scheme: string): string {
   const lines = THEME_KEYS.map(
     (key) => `  ${TOKEN_NAMES[key]}: ${palette[key]};`,
   );
+  // Text on a --primary fill (the selected palette row), picked exactly as the
+  // TUI's CommandPalette does.
+  lines.push(`  --on-primary: ${contrastingForeground(palette.primary)};`);
   return `${selector} {\n  color-scheme: ${scheme};\n${lines.join("\n")}\n}`;
 }
 

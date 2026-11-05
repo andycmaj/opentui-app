@@ -14,6 +14,7 @@ const Tag = href ? "a" : "div";
 
 <Tag
   href={href}
+  data-nav-item={href ? "" : undefined}
   class:list={["card", { "is-selected": selected }, className]}
   style={accent ? `--card-accent: ${accent}` : undefined}
 >

@@ -1,0 +1,153 @@
+/*
+ * Overlays rendered by the Solid islands (palette, search, help). Global
+ * rather than scoped because islands don't get Astro's scoped styles.
+ * Layout follows core's Modal: opaque --pane surface two rows from the top,
+ * 100 cells wide at most, two-cell side padding.
+ */
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: calc(var(--row) * 2 + env(safe-area-inset-top, 0px)) var(--cell)
+    var(--row);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+
+.overlay-modal {
+  width: min(100ch, 100%);
+  max-height: calc(100dvh - var(--row) * 4);
+  display: flex;
+  flex-direction: column;
+  background: var(--pane);
+  color: var(--text);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.35);
+}
+
+.overlay-header {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(var(--cell) * 2);
+  padding: var(--row) calc(var(--cell) * 2) 0;
+}
+
+.overlay-filter {
+  padding: var(--row) calc(var(--cell) * 2);
+}
+
+.overlay-filter input {
+  width: 100%;
+  padding: 0 var(--cell);
+  border: 0;
+  outline: none;
+  background: var(--bg);
+  color: var(--text);
+  caret-color: var(--primary);
+  font: inherit;
+  line-height: var(--row);
+}
+
+.overlay-filter input::placeholder {
+  color: var(--muted);
+}
+
+.overlay-list {
+  overflow-y: auto;
+  padding: 0 calc(var(--cell) * 2) var(--row);
+}
+
+.overlay-group {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+[role="group"] + [role="group"] .overlay-group {
+  margin-top: var(--row);
+}
+
+.overlay-row {
+  padding: 0 var(--cell);
+  cursor: pointer;
+}
+
+.overlay-row.indented {
+  padding-left: calc(var(--cell) * 2);
+}
+
+.overlay-row-main {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(var(--cell) * 2);
+}
+
+.overlay-hint {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.overlay-row[aria-selected="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+
+.overlay-row[aria-selected="true"] :is(.overlay-hint, .overlay-excerpt) {
+  color: var(--on-primary);
+}
+
+.overlay-excerpt {
+  display: block;
+  padding-bottom: calc(var(--row) * 0.25);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 0.92rem;
+}
+
+.overlay-excerpt mark {
+  background: none;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.overlay-row[aria-selected="true"] .overlay-excerpt mark {
+  color: var(--on-primary);
+  text-decoration: underline;
+}
+
+.overlay-empty {
+  margin: 0;
+}
+
+.overlay-help {
+  padding: var(--row) calc(var(--cell) * 2);
+  outline: none;
+  overflow-y: auto;
+}
+
+.overlay-help section + section {
+  margin-top: var(--row);
+}
+
+.overlay-help-row {
+  display: grid;
+  grid-template-columns: 12ch 1fr;
+}
+
+.overlay-help-row kbd {
+  font-size: inherit;
+  color: var(--primary);
+}
+
+.overlay-close {
+  margin-top: var(--row);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--secondary);
+  font: inherit;
+  cursor: pointer;
+}

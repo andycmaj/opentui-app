@@ -30,15 +30,27 @@ const nav = [
       ))
     }
   </nav>
-  <span class="theme muted">
-    theme <span class="theme-name" data-theme-name>{SITE_THEMES[0]}</span>
-  </span>
+  <div class="tools">
+    <button type="button" data-open-search aria-label="Search (/)">
+      <span class="key">/</span> search
+    </button>
+    <button type="button" data-cycle-theme aria-label="Cycle theme (t)">
+      theme <span class="theme-name" data-theme-name>{SITE_THEMES[0]}</span>
+    </button>
+  </div>
 </header>
 
 <script>
-  const name = document.documentElement.dataset.theme ?? "default";
-  document.querySelectorAll("[data-theme-name]").forEach((el) => {
-    el.textContent = name;
+  // Mouse and touch entry points for what the keyboard does with `/` and `t`.
+  import { Overlay, openOverlay } from "../lib/overlay";
+  import { cycleTheme, syncThemeLabels } from "../lib/site-theme";
+
+  syncThemeLabels();
+  document.querySelector("[data-open-search]")?.addEventListener("click", () => {
+    openOverlay(Overlay.SEARCH);
+  });
+  document.querySelector("[data-cycle-theme]")?.addEventListener("click", () => {
+    cycleTheme();
   });
 </script>
 
@@ -81,8 +93,24 @@ const nav = [
     color: var(--primary);
     text-decoration: none;
   }
-  .theme {
+  .tools {
     margin-left: auto;
+    display: flex;
+    gap: calc(var(--cell) * 2);
+  }
+  .tools button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+  }
+  .tools button:hover {
+    color: var(--text);
+  }
+  .key {
+    color: var(--primary);
   }
   .theme-name {
     color: var(--accent);

@@ -1,13 +1,13 @@
 {
   "name": "@opentui-app/site",
   "version": "0.1.0",
-  "description": "panes — website for @andycmaj/opentui-app and the apps built on it",
+  "description": "panes \u2014 website for @andycmaj/opentui-app and the apps built on it",
   "type": "module",
   "private": true,
   "scripts": {
     "tokens": "bun run scripts/gen-tokens.ts",
     "dev": "bun run tokens && bun --bun astro dev",
-    "build": "bun run tokens && bun --bun astro build",
+    "build": "bun run tokens && bun --bun astro build && pagefind --site dist",
     "preview": "bun --bun astro preview",
     "typecheck": "bun run tokens && bun --bun astro check"
   },
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "pagefind": "^1.6.0",
     "typescript": "5.9.3"
   }
 }
