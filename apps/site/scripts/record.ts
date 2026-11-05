@@ -148,8 +148,18 @@ async function main(): Promise<void> {
   // which shouldn't end up as the cast's last frame.
   const end = (performance.now() - start) / 1000;
   const frames = events.length;
+  // Apps on @andycmaj/opentui-app can outlive SIGTERM (OpenTUI's signal
+  // handler destroys the renderer but doesn't exit), so force it after a grace
+  // period.
   proc.kill();
-  await proc.exited;
+  const exited = await Promise.race([
+    proc.exited.then(() => true),
+    sleep(2000).then(() => false),
+  ]);
+  if (!exited) {
+    proc.kill("SIGKILL");
+    await proc.exited;
+  }
   events.length = frames;
 
   const header = {

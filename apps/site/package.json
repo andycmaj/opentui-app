@@ -1,7 +1,7 @@
 {
   "name": "@opentui-app/site",
   "version": "0.1.0",
-  "description": "panes — website for @andycmaj/opentui-app and the apps built on it",
+  "description": "panes \u2014 website for @andycmaj/opentui-app and the apps built on it",
   "type": "module",
   "private": true,
   "scripts": {
@@ -10,7 +10,8 @@
     "build": "bun run tokens && bun run api && bun --bun astro build && pagefind --site dist",
     "preview": "bun --bun astro preview",
     "typecheck": "bun run tokens && bun run api && bun --bun astro check",
-    "api": "bun run scripts/gen-api.ts"
+    "api": "bun run scripts/gen-api.ts",
+    "record": "bun run scripts/record-all.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.1",
