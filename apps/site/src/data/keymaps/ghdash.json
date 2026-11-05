@@ -1,0 +1,142 @@
+{
+  "app": [
+    {
+      "keys": "^p/:",
+      "desc": "palette"
+    },
+    {
+      "keys": "space",
+      "desc": "section picker"
+    },
+    {
+      "keys": "q/^c",
+      "desc": "quit"
+    },
+    {
+      "keys": "^e",
+      "desc": "sidebar"
+    },
+    {
+      "keys": "Tab",
+      "desc": "switch"
+    },
+    {
+      "keys": "r",
+      "desc": "refresh"
+    },
+    {
+      "keys": "l",
+      "desc": "open loki logs"
+    },
+    {
+      "keys": "p",
+      "desc": "open one of my PRs"
+    },
+    {
+      "keys": "y",
+      "desc": "copy PR link"
+    },
+    {
+      "keys": "d",
+      "desc": "toggle draft/ready"
+    },
+    {
+      "keys": "?",
+      "desc": "keyboard help"
+    }
+  ],
+  "sections": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "o",
+      "desc": "open in browser"
+    },
+    {
+      "keys": "Enter",
+      "desc": "select"
+    }
+  ],
+  "content": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "o",
+      "desc": "open in browser"
+    },
+    {
+      "keys": "Enter",
+      "desc": "expand/collapse"
+    },
+    {
+      "keys": "a",
+      "desc": "toggle annotations"
+    },
+    {
+      "keys": "e",
+      "desc": "edit"
+    },
+    {
+      "keys": "c",
+      "desc": "reply"
+    },
+    {
+      "keys": "x",
+      "desc": "resolve/unresolve thread"
+    },
+    {
+      "keys": "f",
+      "desc": "cycle feed filter"
+    },
+    {
+      "keys": "y",
+      "desc": "copy link to selected item"
+    },
+    {
+      "keys": "L",
+      "desc": "open job logs in $EDITOR"
+    },
+    {
+      "keys": "pageup",
+      "desc": "pgup"
+    },
+    {
+      "keys": "pagedown",
+      "desc": "pgdn"
+    }
+  ],
+  "terminal": [
+    {
+      "keys": "^]",
+      "desc": "detach terminal"
+    }
+  ]
+}

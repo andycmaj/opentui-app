@@ -11,7 +11,8 @@
     "preview": "bun --bun astro preview",
     "typecheck": "bun run tokens && bun run api && bun --bun astro check",
     "api": "bun run scripts/gen-api.ts",
-    "record": "bun run scripts/record-all.ts"
+    "record": "bun run scripts/record-all.ts",
+    "keymaps": "bun run scripts/extract-keymaps.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.1",

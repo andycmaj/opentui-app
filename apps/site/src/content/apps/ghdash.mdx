@@ -7,7 +7,13 @@ repo: https://github.com/andycmaj/ghdash
 requires:
   - A GitHub token (`GITHUB_TOKEN`, `GH_TOKEN`, or a logged-in `gh` CLI) with `repo`, `read:org`, and `workflow` scopes
 configPath: ~/.config/ghdash/config.json
+keymapScopes:
+  - { id: app, title: "Global" }
+  - { id: sections, title: "Sections List" }
+  - { id: content, title: "Content View" }
 ---
+
+import Keybindings from "../../components/Keybindings.astro";
 
 ## Features
 
@@ -21,6 +27,10 @@ configPath: ~/.config/ghdash/config.json
   different pull request, no checkout needed.
 - `o` opens the PR in the browser, `r` refreshes, and `--poll <ms>` sets the
   poll interval.
+
+## Keys
+
+<Keybindings app="ghdash" />
 
 ## Configuration
 

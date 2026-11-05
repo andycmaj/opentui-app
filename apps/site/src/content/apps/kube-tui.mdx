@@ -6,7 +6,13 @@ order: 3
 repo: https://github.com/andycmaj/kube-tui
 requires:
   - "`kubectl` on your `PATH` with a working kubeconfig"
+keymapScopes:
+  - { id: app, title: "Global" }
+  - { id: tree, title: "Resources" }
+  - { id: content, title: "Content" }
 ---
+
+import Keybindings from "../../components/Keybindings.astro";
 
 ## Features
 
@@ -20,6 +26,10 @@ requires:
 - **Operations**: delete (`ctrl+d`), rollout restart (`shift+r`) and scale
   (`shift+s`), each confirmed in a dialog.
 - `:` jumps to any kind, k9s-style, and `n` switches namespace.
+
+## Keys
+
+<Keybindings app="kube-tui" />
 
 ## Usage
 

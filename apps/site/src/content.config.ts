@@ -12,6 +12,11 @@ const apps = defineCollection({
     repo: z.string(),
     requires: z.array(z.string()),
     configPath: z.string().optional(),
+    // Which keymap scopes the page shows, in order, titled as in the app's
+    // own `?` help screen.
+    keymapScopes: z
+      .array(z.object({ id: z.string(), title: z.string() }))
+      .default([]),
   }),
 });
 

@@ -7,7 +7,13 @@ repo: https://github.com/andycmaj/tilt-tui
 requires:
   - A running `tilt` process
 configPath: ~/.config/tilt-tui/config.json
+keymapScopes:
+  - { id: app, title: "Global" }
+  - { id: tree, title: "Tree View" }
+  - { id: resource, title: "Log View" }
 ---
+
+import Keybindings from "../../components/Keybindings.astro";
 
 ## Features
 
@@ -20,6 +26,10 @@ configPath: ~/.config/tilt-tui/config.json
 - **Actions** from the keyboard: trigger a reload (`r`), enable or disable a
   resource (`ctrl+d`), inspect a resource (`i`) or the Tilt engine (`w`).
 - **Self-updating**: notices new releases and offers to install them.
+
+## Keys
+
+<Keybindings app="tilt-tui" />
 
 ## Configuration
 
