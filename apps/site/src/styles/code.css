@@ -1,0 +1,18 @@
+/* Shiki's css-variables theme, mapped onto the framework palette. */
+:root {
+  --astro-code-foreground: var(--text);
+  --astro-code-background: var(--pane);
+  --astro-code-token-keyword: var(--accent);
+  --astro-code-token-string: var(--success);
+  --astro-code-token-string-expression: var(--success);
+  --astro-code-token-comment: var(--muted);
+  --astro-code-token-function: var(--secondary);
+  --astro-code-token-constant: var(--primary);
+  --astro-code-token-parameter: var(--text);
+  --astro-code-token-punctuation: var(--muted);
+  --astro-code-token-link: var(--info);
+}
+
+pre.astro-code code {
+  color: inherit;
+}

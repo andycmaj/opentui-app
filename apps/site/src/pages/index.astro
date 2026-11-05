@@ -1,4 +1,5 @@
 ---
+import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
 import Pane from "../components/Pane.astro";
 import PaneHeader from "../components/PaneHeader.astro";
@@ -7,18 +8,13 @@ import StatusBadge from "../components/StatusBadge.astro";
 import KeyHints from "../components/KeyHints.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-// Placeholder gallery until the content collections land (phase 3).
-const apps = [
-  { slug: "tilt-tui", name: "tilt-tui", status: "stable", pitch: "A terminal UI for tilt.dev with vim-like navigation." },
-  { slug: "ghdash-tui", name: "ghdash-tui", status: "stable", pitch: "A GitHub dashboard for your PRs and reviews." },
-  { slug: "kube-tui", name: "kube-tui", status: "beta", pitch: "Browse and inspect Kubernetes resources." },
-] as const;
+const apps = (await getCollection("apps")).sort((a, b) => a.data.order - b.data.order);
+const first = apps[0]?.data.name ?? "";
 ---
 
 <Base section="apps">
   <Pane focused class="hero" aria-label="Demo">
-    <PaneHeader title="tilt-tui" level={1}>
+    <PaneHeader title={first} level={1}>
       <KeyHints hints={[{ keys: "←/→", text: "switch app" }]} />
     </PaneHeader>
     <div class="screen">recording goes here</div>
@@ -34,12 +30,12 @@ const apps = [
     </Card>
     {
       apps.map((app) => (
-        <Card href={`${base}/apps/${app.slug}/`}>
+        <Card href={`${base}/apps/${app.id}/`}>
           <Fragment slot="header">
-            <strong class="name">{app.name}</strong>
-            <StatusBadge status={app.status} />
+            <strong class="name">{app.data.name}</strong>
+            <StatusBadge status={app.data.status} />
           </Fragment>
-          <p>{app.pitch}</p>
+          <p>{app.data.pitch}</p>
         </Card>
       ))
     }

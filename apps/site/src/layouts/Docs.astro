@@ -1,0 +1,153 @@
+---
+// Framework docs: the grey sidebar pane (docs pages, then the API tree) next
+// to a focused content pane, like a two-pane app.
+import { getCollection } from "astro:content";
+import Base from "./Base.astro";
+import Pane from "../components/Pane.astro";
+import PaneHeader from "../components/PaneHeader.astro";
+import Marker from "../components/Marker.astro";
+import { apiPath, docPath } from "../lib/site-pages";
+
+interface Props {
+  title: string;
+  description?: string;
+  // Site path (without the base) of the page being shown.
+  path: string;
+}
+const { title, description, path } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const docs = (await getCollection("docs")).sort((a, b) => a.data.order - b.data.order);
+const api = await getCollection("api");
+
+const KIND_LABELS: [string, string][] = [
+  ["functions", "functions"],
+  ["variables", "constants"],
+  ["interfaces", "interfaces"],
+  ["type-aliases", "types"],
+  ["classes", "classes"],
+];
+const apiGroups = KIND_LABELS.map(([kind, label]) => ({
+  kind,
+  label,
+  entries: api
+    .filter((e) => e.id.startsWith(`${kind}/`))
+    .map((e) => ({ name: e.id.slice(kind.length + 1), path: apiPath(e.id) }))
+    .sort((a, b) => a.name.localeCompare(b.name)),
+})).filter((g) => g.entries.length > 0);
+
+const inApi = path.startsWith("/framework/api/");
+const links = [
+  ...docs.map((d) => ({ label: d.data.navLabel ?? d.data.title.toLowerCase(), path: docPath(d.id) })),
+  { label: "api reference", path: "/framework/api/" },
+];
+---
+
+<Base title={title} description={description} section="framework">
+  <Pane slot="sidebar" variant="sidebar" as="nav" aria-label="Framework docs" class="docs-sidebar">
+    <PaneHeader title="framework" />
+    <ul class="docs-nav" data-nav-list>
+      {
+        links.map((link) => (
+          <li>
+            <Marker selected={link.path === path || (link.path === "/framework/api/" && inApi)} />
+            <a
+              href={`${base}${link.path}`}
+              data-nav-item
+              aria-current={link.path === path ? "page" : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    {
+      inApi && (
+        <div class="api-tree" data-nav-list>
+          {apiGroups.map((group) => (
+            <details open={group.entries.some((e) => e.path === path)}>
+              <summary>
+                {group.label} <span class="muted">{group.entries.length}</span>
+              </summary>
+              <ul class="docs-nav">
+                {group.entries.map((entry) => (
+                  <li>
+                    <Marker selected={entry.path === path} />
+                    <a
+                      href={`${base}${entry.path}`}
+                      data-nav-item
+                      aria-current={entry.path === path ? "page" : undefined}
+                    >
+                      {entry.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ))}
+        </div>
+      )
+    }
+  </Pane>
+
+  <Pane as="article" class="doc">
+    <div class="prose">
+      <slot />
+    </div>
+  </Pane>
+</Base>
+
+<style>
+  .docs-sidebar {
+    position: sticky;
+    top: var(--row);
+    max-height: calc(100dvh - var(--row) * 6);
+    overflow-y: auto;
+    align-self: start;
+  }
+  .docs-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .docs-nav li {
+    display: flex;
+    min-width: 0;
+  }
+  .docs-nav a {
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .docs-nav a:focus-visible {
+    outline: none;
+    background: var(--sel-bg);
+    color: var(--sel-fg);
+  }
+  .docs-nav a[aria-current="page"] {
+    color: var(--primary);
+  }
+  .api-tree {
+    margin-top: var(--row);
+  }
+  summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  details ul {
+    margin-left: 1ch;
+  }
+  @media (max-width: 720px) {
+    .docs-sidebar {
+      position: static;
+      max-height: none;
+    }
+  }
+  /* The first heading is the page title; no "## " marker before it. */
+  .doc :global(.prose > h1:first-child) {
+    margin-top: 0;
+  }
+</style>

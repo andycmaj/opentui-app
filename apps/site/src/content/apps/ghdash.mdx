@@ -1,0 +1,38 @@
+---
+name: ghdash
+pitch: A live status dashboard for the current branch's GitHub pull request.
+status: stable
+order: 2
+repo: https://github.com/andycmaj/ghdash
+requires:
+  - A GitHub token (`GITHUB_TOKEN`, `GH_TOKEN`, or a logged-in `gh` CLI) with `repo`, `read:org`, and `workflow` scopes
+configPath: ~/.config/ghdash/config.json
+---
+
+## Features
+
+- **PR feed**: comments, reviews, and review threads for the current worktree's
+  pull request, open, merged or closed.
+- **Actions status**: workflow runs and their annotations.
+- **Mergeability**: every merge blocker in one view, including merge queue
+  state and position. When everything is green, the palette offers
+  **Merge PR — add to merge queue**.
+- **Any PR**: pass `14354`, `owner/repo#14354`, or a PR URL to look at a
+  different pull request, no checkout needed.
+- `o` opens the PR in the browser, `r` refreshes, and `--poll <ms>` sets the
+  poll interval.
+
+## Configuration
+
+Settings live in `~/.config/ghdash/config.json`:
+
+```json
+{
+  "theme": "default",
+  "pollIntervalMs": 15000,
+  "githubToken": "ghp_…"
+}
+```
+
+Set `GHDASH_LOKI_URL` to a Grafana Explore URL to enable `l`, which opens the
+PR's preview-environment logs.

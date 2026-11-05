@@ -1,0 +1,55 @@
+---
+// The one-line install, with a copy button. Every app ships GitHub release
+// binaries that mise installs directly.
+interface Props {
+  command: string;
+}
+const { command } = Astro.props;
+---
+
+<div class="install">
+  <code><span class="prompt" aria-hidden="true">$ </span>{command}</code>
+  <button type="button" data-copy={command} aria-label="Copy install command">copy</button>
+</div>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy ?? "");
+        button.textContent = "copied";
+      } catch {
+        button.textContent = "copy failed";
+      }
+      setTimeout(() => (button.textContent = "copy"), 1500);
+    });
+  }
+</script>
+
+<style>
+  .install {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--cell) * 2);
+    padding: calc(var(--row) * 0.5) calc(var(--cell) * 2);
+    background: var(--pane);
+    border-left: var(--bar) solid var(--primary);
+    overflow-x: auto;
+  }
+  code {
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .prompt {
+    color: var(--muted);
+  }
+  button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--secondary);
+    font: inherit;
+    cursor: pointer;
+  }
+</style>

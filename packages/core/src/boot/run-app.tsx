@@ -59,7 +59,9 @@ function AppRuntime(props: {
  * Boot an app. Wraps the root component in the framework's error handling and
  * renders it with sensible TUI defaults.
  *
- *   await runApp(() => <App />);
+ * ```tsx
+ * await runApp(() => <App />);
+ * ```
  */
 export function runApp(
   Root: () => JSX.Element,

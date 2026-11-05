@@ -12,6 +12,7 @@ import {
 } from "solid-js";
 import { moveSelection } from "../lib/palette";
 import { Overlay, onOpenOverlay } from "../lib/overlay";
+import type { PageItem } from "../lib/site-pages";
 import { cycleTheme, syncThemeLabels } from "../lib/site-theme";
 import { CommandPalette } from "./command-palette";
 import { HelpModal } from "./help-modal";
@@ -52,7 +53,10 @@ function moveInList(delta: number): void {
   target?.scrollIntoView({ block: "nearest" });
 }
 
-export default function SiteKeys(props: { base: string }): JSX.Element {
+export default function SiteKeys(props: {
+  base: string;
+  pages: PageItem[];
+}): JSX.Element {
   const [overlay, setOverlay] = createSignal<Overlay | null>(null);
   const close = (): void => {
     setOverlay(null);
@@ -111,7 +115,7 @@ export default function SiteKeys(props: { base: string }): JSX.Element {
   return (
     <Switch>
       <Match when={overlay() === Overlay.PALETTE}>
-        <CommandPalette base={props.base} onClose={close} />
+        <CommandPalette pages={props.pages} onClose={close} />
       </Match>
       <Match when={overlay() === Overlay.SEARCH}>
         <SearchModal base={props.base} onClose={close} />

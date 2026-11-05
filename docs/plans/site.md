@@ -9,7 +9,7 @@ the build plan.
 - **Name / URL:** "panes", GitHub Pages default URL (`andycmaj.github.io/opentui-app`).
 - **Code:** `apps/site` in this monorepo. Astro, custom layout (no Starlight
   theme), small Solid islands.
-- **Apps at launch:** `tilt-tui`, `ghdash-tui`, `kube-tui` (beta). `dotsync`
+- **Apps at launch:** `tilt-tui`, `ghdash` (repo and binary name; the roster called it ghdash-tui), `kube-tui` (beta). `dotsync`
   deferred until public with releases.
 - **Home:** hero pane cycling app recordings (`←/→`, app name in title bar);
   gallery below, framework as first card.

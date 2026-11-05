@@ -3,7 +3,7 @@
 
 import { createMemo, createSignal, type JSX } from "solid-js";
 import { filterSections, type PaletteItem } from "../lib/palette";
-import { sitePages } from "../lib/site-pages";
+import type { PageItem } from "../lib/site-pages";
 import { applyTheme, currentTheme } from "../lib/site-theme";
 import { Overlay, openOverlay } from "../lib/overlay";
 import { SITE_THEMES } from "../themes";
@@ -14,13 +14,13 @@ interface Command extends PaletteItem {
 }
 
 export function CommandPalette(props: {
-  base: string;
+  pages: PageItem[];
   onClose: () => void;
 }): JSX.Element {
   const [query, setQuery] = createSignal("");
 
   const commands: Command[] = [
-    ...sitePages(props.base).map((page) => ({
+    ...props.pages.map((page) => ({
       ...page,
       run: () => {
         window.location.href = page.href;

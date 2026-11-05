@@ -1,0 +1,20 @@
+{
+  "$schema": "https://typedoc-plugin-markdown.org/schema.json",
+  "entryPoints": ["../../packages/core/src/index.ts"],
+  "tsconfig": "../../packages/core/tsconfig.json",
+  "out": "src/content/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "readme": "none",
+  "entryFileName": "index",
+  "outputFileStrategy": "members",
+  "hidePageHeader": true,
+  "hideBreadcrumbs": true,
+  "useCodeBlocks": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "disableSources": true,
+  "parametersFormat": "table",
+  "interfacePropertiesFormat": "table",
+  "publicPath": "/opentui-app/framework/api/",
+  "cleanOutputDir": true
+}

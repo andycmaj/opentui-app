@@ -1,0 +1,84 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Pane from "../../components/Pane.astro";
+import PaneHeader from "../../components/PaneHeader.astro";
+import StatusBadge from "../../components/StatusBadge.astro";
+import InstallCommand from "../../components/InstallCommand.astro";
+
+export async function getStaticPaths() {
+  const apps = await getCollection("apps");
+  return apps.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const app = entry.data;
+const repoPath = new URL(app.repo).pathname.slice(1);
+// Requirements are one-liners with `code` spans; escape, then mark those up.
+const inlineCode = (text: string): string =>
+  text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/`([^`]+)`/g, "<code>$1</code>");
+---
+
+<Base title={app.name} description={app.pitch} section="apps">
+  <Pane focused aria-label={`${app.name} demo`}>
+    <PaneHeader title={app.name} level={1}>
+      <StatusBadge status={app.status} />
+    </PaneHeader>
+    <div class="screen">recording goes here</div>
+  </Pane>
+
+  <Pane as="article">
+    <p class="pitch">{app.pitch}</p>
+
+    <h2>Install</h2>
+    <InstallCommand command={`mise use -g github:${repoPath}`} />
+    <p class="muted note">
+      Prebuilt binaries for macOS and Linux (arm64, x64) from{" "}
+      <a href={`${app.repo}/releases`}>GitHub releases</a>, installed with{" "}
+      <a href="https://mise.jdx.dev">mise</a>.
+    </p>
+
+    <h2>Requirements</h2>
+    <ul class="prose">
+      {app.requires.map((req) => <li set:html={inlineCode(req)} />)}
+    </ul>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <p class="repo">
+      <span class="muted">source</span> <a href={app.repo}>{repoPath}</a>
+    </p>
+  </Pane>
+</Base>
+
+<style>
+  .screen {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 120 / 36;
+    max-width: 100%;
+    background: var(--pane);
+    color: var(--muted);
+  }
+  article {
+    max-width: calc(var(--content-w) + 4ch);
+  }
+  .pitch {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+  .note {
+    font-size: 0.9rem;
+  }
+  .repo {
+    margin-top: calc(var(--row) * 2);
+  }
+</style>

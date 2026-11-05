@@ -8,4 +8,9 @@ export default defineConfig({
   base: "/opentui-app",
   trailingSlash: "ignore",
   integrations: [mdx(), solid()],
+  markdown: {
+    // Token colors come from CSS variables (styles/code.css), so code blocks
+    // follow the site theme like everything else.
+    shikiConfig: { theme: "css-variables" },
+  },
 });
