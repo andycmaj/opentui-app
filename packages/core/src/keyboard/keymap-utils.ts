@@ -58,7 +58,9 @@ export interface HelpBinding<Ctx = unknown> {
 
 /**
  * Bindings reachable from `focused` (the current focus when omitted), in
- * dispatch order: the innermost layer first, then enclosing layers.
+ * dispatch order: the innermost layer first, then enclosing layers. A key bound
+ * by an inner layer shadows the same key in outer layers, so only the binding
+ * that would actually run is returned.
  */
 export function reachableBindings(
   keymap: AppKeymap,
@@ -70,16 +72,20 @@ export function reachableBindings(
       : { visibility: "reachable", focused },
   );
   const result: HelpBinding[] = [];
+  const claimed = new Set<string>();
   for (const entry of entries) {
     for (const binding of entry.bindings) {
       const stroke = binding.sequence[0]?.stroke;
       if (!stroke) continue;
+      const keys = binding.sequence
+        .map((part) => formatStroke(part.stroke))
+        .join("");
+      if (claimed.has(keys)) continue;
+      claimed.add(keys);
       const attrs = binding.attrs ?? {};
       result.push({
         cmd: entry.command.name,
-        keys: binding.sequence
-          .map((part) => formatStroke(part.stroke))
-          .join(""),
+        keys,
         desc: typeof attrs.desc === "string" ? attrs.desc : entry.command.name,
         help: typeof attrs.help === "string" ? attrs.help : undefined,
         scope: typeof attrs.scope === "string" ? attrs.scope : undefined,
