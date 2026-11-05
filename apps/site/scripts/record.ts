@@ -60,8 +60,8 @@ export function parseKeyScript(text: string): Step[] {
   for (const [i, raw] of text.split("\n").entries()) {
     const line = raw.replace(/\s+#.*$/, "").trim();
     if (!line || line.startsWith("#")) continue;
-    const [verb, ...args] = line.split(/\s+/);
-    const arg = line.slice(verb!.length).trim();
+    const [verb = "", ...args] = line.split(/\s+/);
+    const arg = line.slice(verb.length).trim();
     if (verb === "key") {
       for (const k of args) steps.push({ kind: "send", data: encodeKey(k) });
     } else if (verb === "type") {
