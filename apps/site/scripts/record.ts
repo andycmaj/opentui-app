@@ -150,14 +150,22 @@ async function main(): Promise<void> {
   const frames = events.length;
   // Apps on @andycmaj/opentui-app can outlive SIGTERM (OpenTUI's signal
   // handler destroys the renderer but doesn't exit), so force it after a grace
-  // period.
-  proc.kill();
+  // period. The PTY makes the app a session leader, so signalling its process
+  // group also stops anything it spawned (e.g. kubectl watches).
+  const signalGroup = (signal: NodeJS.Signals): void => {
+    try {
+      process.kill(-proc.pid, signal);
+    } catch {
+      proc.kill(signal);
+    }
+  };
+  signalGroup("SIGTERM");
   const exited = await Promise.race([
     proc.exited.then(() => true),
     sleep(2000).then(() => false),
   ]);
   if (!exited) {
-    proc.kill("SIGKILL");
+    signalGroup("SIGKILL");
     await proc.exited;
   }
   events.length = frames;
