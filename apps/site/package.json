@@ -1,7 +1,7 @@
 {
   "name": "@opentui-app/site",
   "version": "0.1.0",
-  "description": "panes \u2014 website for @andycmaj/opentui-app and the apps built on it",
+  "description": "panes — website for @andycmaj/opentui-app and the apps built on it",
   "type": "module",
   "private": true,
   "scripts": {
@@ -17,6 +17,7 @@
     "@astrojs/solid-js": "^7.1.1",
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
+    "asciinema-player": "3.17.0",
     "astro": "^7.4.2",
     "marked": "^17.0.1",
     "solid-js": "1.9.12"

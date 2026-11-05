@@ -5,6 +5,8 @@ import Pane from "../../components/Pane.astro";
 import PaneHeader from "../../components/PaneHeader.astro";
 import StatusBadge from "../../components/StatusBadge.astro";
 import InstallCommand from "../../components/InstallCommand.astro";
+import Recording from "../../islands/recording";
+import { castUrl } from "../../lib/casts";
 
 export async function getStaticPaths() {
   const apps = await getCollection("apps");
@@ -14,6 +16,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const app = entry.data;
+const cast = castUrl(entry.id);
 const repoPath = new URL(app.repo).pathname.slice(1);
 // Requirements are one-liners with `code` spans; escape, then mark those up.
 const inlineCode = (text: string): string =>
@@ -28,7 +31,7 @@ const inlineCode = (text: string): string =>
     <PaneHeader title={app.name} level={1}>
       <StatusBadge status={app.status} />
     </PaneHeader>
-    <div class="screen">recording goes here</div>
+    {cast ? <Recording client:visible src={cast} /> : <div class="screen">recording coming soon</div>}
   </Pane>
 
   <Pane as="article">

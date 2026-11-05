@@ -159,6 +159,35 @@ function block(selector: string, palette: Palette, scheme: string): string {
   return `${selector} {\n  color-scheme: ${scheme};\n${lines.join("\n")}\n}`;
 }
 
+// Recordings are always made in the `default` theme, so the player's ANSI
+// palette is that theme's, whatever the site theme is.
+const d = fromTheme(defaultTheme);
+const ansi = [
+  d.background,
+  d.error,
+  d.success,
+  d.warning,
+  d.secondary,
+  d.accent,
+  d.info,
+  d.text,
+  d.textMuted,
+  d.error,
+  d.success,
+  d.warning,
+  d.secondary,
+  d.accent,
+  d.info,
+  "#ffffff",
+];
+const playerTheme = [
+  ".asciinema-player-theme-panes {",
+  `  --term-color-foreground: ${d.text};`,
+  `  --term-color-background: ${d.background};`,
+  ...ansi.map((c, i) => `  --term-color-${i}: ${c};`),
+  "}",
+].join("\n");
+
 // `default` sits on bare :root so the page is styled even before the theme
 // script runs or with JS disabled.
 const css = [
@@ -171,6 +200,7 @@ const css = [
   block(':root[data-theme="terminal"]', terminalPalette("light"), "light"),
   block(':root[data-theme="mono"]', monoPalette("light"), "light"),
   "}",
+  playerTheme,
   "",
 ].join("\n\n");
 

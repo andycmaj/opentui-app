@@ -16,9 +16,12 @@ the build plan.
 - **App page:** recording → pitch → status badge → install
   (`mise use -g github:andycmaj/<app>`) → features → keybindings (generated from
   the app's `keymap`) → config → repo link.
-- **Demos:** asciinema recordings of the real app in `--demo` mode (fixture data
-  via `DataSource<T>`), `default` theme only, one recording per app. Driven by
-  tmux `send-keys` from a key-sequence file in each app repo. Played with
+- **Demos:** asciinema recordings of the real app running on fixture data,
+  `default` theme only, one recording per app. Each app has an env-gated
+  fixture mode (`GHDASH_FIXTURE` already existed; `TILT_TUI_FIXTURE` and
+  `KUBE_TUI_FIXTURE` follow it). No core helper: the apps don't use
+  `DataSource<T>`. Recorded by `apps/site/scripts/record.ts` (Bun PTY +
+  key script, writes asciicast v2; no tmux/asciinema install). Played with
   asciinema-player.
 - **Framework docs at launch:** overview, Quick Start, keymaps guide (backed by
   a new keymaps example program + recording), TypeDoc API reference, changelog.

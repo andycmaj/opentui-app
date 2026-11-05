@@ -1,0 +1,16 @@
+# Keymaps example: pane scope shadows app scope, then falls through.
+wait 600
+key j j          # move in the colors pane
+key space        # colors.pick
+key j space
+key s            # colors.sort (the pane's `s`)
+wait 400
+key tab          # focus the dispatch log
+key s            # app.save (the app's `s`)
+wait 800
+key ?            # help: every binding, by scope
+wait 1500
+key esc
+key tab
+key s            # back in colors: sorts again
+wait 1200

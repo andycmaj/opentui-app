@@ -151,3 +151,12 @@
   font: inherit;
   cursor: pointer;
 }
+
+/* Recordings sit flush inside their pane. */
+.recording {
+  margin: var(--row) 0;
+}
+
+.recording .ap-player {
+  border-radius: 0;
+}

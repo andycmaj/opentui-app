@@ -7,6 +7,8 @@ order: 2
 import { Code } from "astro:components";
 import keymapSource from "../../../../../example/src/examples/keymaps/keymap.ts?raw";
 import commandsSource from "../../../../../example/src/examples/keymaps/commands.ts?raw";
+import Recording from "../../../islands/recording";
+import { castUrl } from "../../../lib/casts";
 
 Every key an app understands is declared once, in a table keyed by **scope**.
 The framework reads that table to dispatch keys, to fill the footer, to list
@@ -21,6 +23,8 @@ bun run dev:example keymaps
 
 It has two panes, a list of colors and a dispatch log. Every key you press
 shows up in the log, together with the scope that handled it.
+
+<Recording client:visible src={castUrl("keymaps")} posterAt={9} />
 
 ## Commands
 
