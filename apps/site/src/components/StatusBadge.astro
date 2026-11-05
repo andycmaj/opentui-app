@@ -1,0 +1,24 @@
+---
+// Glyph + label, like core's StatusIndicator: state survives the mono theme
+// because it never relies on color alone.
+interface Props {
+  status: "stable" | "beta";
+}
+const { status } = Astro.props;
+const glyph = status === "stable" ? "●" : "◐";
+---
+
+<span class:list={["badge", `badge--${status}`]}>{glyph} {status}</span>
+
+<style>
+  .badge {
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+  .badge--stable {
+    color: var(--success);
+  }
+  .badge--beta {
+    color: var(--warning);
+  }
+</style>

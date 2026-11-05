@@ -1,0 +1,19 @@
+---
+// Mirrors core's <Marker>: a fixed-width selection glyph column.
+interface Props {
+  selected: boolean;
+  glyph?: string;
+}
+const { selected, glyph = "▸" } = Astro.props;
+---
+
+<span class="marker" aria-hidden="true">{selected ? glyph : " "}</span>
+
+<style>
+  .marker {
+    display: inline-block;
+    width: 2ch;
+    color: var(--primary);
+    white-space: pre;
+  }
+</style>

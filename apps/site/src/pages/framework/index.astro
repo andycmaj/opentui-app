@@ -1,0 +1,60 @@
+---
+import Base from "../../layouts/Base.astro";
+import Pane from "../../components/Pane.astro";
+import PaneHeader from "../../components/PaneHeader.astro";
+import Marker from "../../components/Marker.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+// Placeholder nav until the docs collection lands (phase 3).
+const pages = [
+  { label: "overview", href: `${base}/framework/`, current: true },
+  { label: "quick start", href: `${base}/framework/quick-start/`, current: false },
+  { label: "keymaps", href: `${base}/framework/guides/keymaps/`, current: false },
+  { label: "api", href: `${base}/framework/api/`, current: false },
+];
+---
+
+<Base title="framework" section="framework">
+  <Pane slot="sidebar" variant="sidebar" as="nav" aria-label="Framework docs">
+    <PaneHeader title="framework" />
+    <ul class="docs-nav">
+      {
+        pages.map((page) => (
+          <li>
+            <Marker selected={page.current} />
+            <a href={page.href} aria-current={page.current ? "page" : undefined}>
+              {page.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Pane>
+
+  <Pane as="article">
+    <h1>@andycmaj/opentui-app</h1>
+    <div class="prose">
+      <p>
+        An app framework and design library for <code>@opentui/solid</code> terminal UIs. New apps
+        supply only their domain — a data source, commands, and screens; the framework provides
+        everything else.
+      </p>
+      <h2>Quick start</h2>
+      <pre><code>bun add @andycmaj/opentui-app</code></pre>
+    </div>
+  </Pane>
+</Base>
+
+<style>
+  .docs-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .docs-nav a {
+    color: var(--text);
+  }
+  .docs-nav a[aria-current="page"] {
+    color: var(--primary);
+  }
+</style>

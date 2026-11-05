@@ -1,0 +1,90 @@
+---
+import { SITE_THEMES } from "../themes";
+
+interface Props {
+  current?: "apps" | "framework" | "changelog";
+}
+const { current } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const nav = [
+  { id: "apps", label: "apps", href: `${base}/#apps` },
+  { id: "framework", label: "framework", href: `${base}/framework/` },
+  { id: "changelog", label: "changelog", href: `${base}/changelog/` },
+] as const;
+---
+
+<header class="site-header">
+  <a class="brand" href={`${base}/`} aria-label="panes home">
+    <span class="bar" aria-hidden="true"></span>panes
+  </a>
+  <nav aria-label="Main">
+    {
+      nav.map((item) => (
+        <a
+          href={item.href}
+          class:list={{ active: item.id === current }}
+          aria-current={item.id === current ? "page" : undefined}
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+  <span class="theme muted">
+    theme <span class="theme-name" data-theme-name>{SITE_THEMES[0]}</span>
+  </span>
+</header>
+
+<script>
+  const name = document.documentElement.dataset.theme ?? "default";
+  document.querySelectorAll("[data-theme-name]").forEach((el) => {
+    el.textContent = name;
+  });
+</script>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--row) * 0.25) calc(var(--cell) * 3);
+    padding: calc(var(--row) * 0.75) calc(var(--cell) * 2);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 1ch;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+  .brand:hover {
+    text-decoration: none;
+  }
+  .bar {
+    display: inline-block;
+    width: var(--bar);
+    height: 1.2em;
+    background: var(--secondary);
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 calc(var(--cell) * 2);
+  }
+  nav a {
+    color: var(--muted);
+  }
+  nav a.active,
+  nav a:hover {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .theme {
+    margin-left: auto;
+  }
+  .theme-name {
+    color: var(--accent);
+  }
+</style>

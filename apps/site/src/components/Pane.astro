@@ -1,0 +1,45 @@
+---
+// Mirrors core's <Pane>: a borderless surface. "sidebar" is the grey elevated
+// surface; focus (keyboard focus within, or `focused`) shows the heavy left bar
+// in --secondary without shifting content.
+interface Props {
+  variant?: "content" | "sidebar";
+  focused?: boolean;
+  as?: "section" | "aside" | "nav" | "div" | "article";
+  class?: string;
+  [key: string]: unknown;
+}
+const {
+  variant = "content",
+  focused = false,
+  as: Tag = "section",
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<Tag
+  class:list={["pane", `pane--${variant}`, { "is-focused": focused }, className]}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<style>
+  .pane {
+    position: relative;
+    padding: var(--row) calc(var(--cell) * 2);
+    border-left: var(--bar) solid transparent;
+    min-width: 0;
+  }
+  .pane--content {
+    background: var(--bg);
+  }
+  .pane--sidebar {
+    background: var(--pane);
+  }
+  .pane.is-focused,
+  .pane:focus-within {
+    border-left-color: var(--secondary);
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+import "../styles/global.css";
+import ThemeScript from "../components/ThemeScript.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  section?: "apps" | "framework" | "changelog";
+}
+const {
+  title,
+  description = "Terminal apps built on @andycmaj/opentui-app, and the framework itself.",
+  section,
+} = Astro.props;
+const fullTitle = title ? `${title} · panes` : "panes";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+    <ThemeScript />
+  </head>
+  <body>
+    <div class="shell">
+      <SiteHeader current={section} />
+      <div class:list={["frame", { "has-sidebar": Astro.slots.has("sidebar") }]}>
+        {Astro.slots.has("sidebar") && <slot name="sidebar" />}
+        <main id="main">
+          <slot />
+        </main>
+      </div>
+      <SiteFooter />
+    </div>
+  </body>
+</html>
+
+<style>
+  .shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+  /* One-cell window-frame margin, like core's framed Pane. */
+  .frame {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--row) var(--cell);
+    padding: var(--row) var(--cell);
+  }
+  .frame.has-sidebar {
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  }
+  main {
+    min-width: 0;
+  }
+  @media (max-width: 720px) {
+    .frame.has-sidebar {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

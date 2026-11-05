@@ -1,0 +1,38 @@
+---
+// Mirrors core's <PaneHeader>: bold title on the left, optional right slot.
+interface Props {
+  title: string;
+  color?: string;
+  level?: 1 | 2 | 3;
+}
+const { title, color, level = 2 } = Astro.props;
+const Tag = `h${level}` as "h1" | "h2" | "h3";
+---
+
+<header class="pane-header">
+  <Tag class="title" style={color ? `color: ${color}` : undefined}>{title}</Tag>
+  <div class="right"><slot /></div>
+</header>
+
+<style>
+  .pane-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 calc(var(--cell) * 2);
+    margin-bottom: var(--row);
+  }
+  .title {
+    margin: 0;
+    font-size: 1rem;
+    line-height: var(--row);
+    color: var(--primary);
+  }
+  .title::before {
+    content: none;
+  }
+  .right {
+    color: var(--muted);
+  }
+</style>

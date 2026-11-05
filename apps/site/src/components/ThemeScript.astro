@@ -1,0 +1,18 @@
+---
+// Runs before first paint so a stored theme never flashes the default.
+// `?theme=` overrides (handy for links and screenshots) without persisting.
+import { SITE_THEMES, THEME_STORAGE_KEY } from "../themes";
+---
+
+<script is:inline define:vars={{ themes: SITE_THEMES, key: THEME_STORAGE_KEY }}>
+  (function () {
+    var theme = null;
+    try {
+      theme = new URLSearchParams(location.search).get("theme");
+      if (!theme) theme = localStorage.getItem(key);
+    } catch (e) {}
+    if (theme && themes.indexOf(theme) !== -1) {
+      document.documentElement.dataset.theme = theme;
+    }
+  })();
+</script>

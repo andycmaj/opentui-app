@@ -1,0 +1,36 @@
+---
+import KeyHints from "./KeyHints.astro";
+
+// The site's own keybind footer, laid out like an app's. Hidden on narrow
+// screens, where there is no keyboard to speak of.
+const hints = [
+  { keys: "ctrl+k", text: "palette" },
+  { keys: "/", text: "search" },
+  { keys: "t", text: "theme" },
+  { keys: "?", text: "help" },
+];
+---
+
+<footer class="site-footer">
+  <KeyHints hints={hints} />
+  <span class="muted right">built with @andycmaj/opentui-app</span>
+</footer>
+
+<style>
+  .site-footer {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    gap: calc(var(--cell) * 2);
+    padding: calc(var(--row) * 0.5) calc(var(--cell) * 2);
+    padding-bottom: calc(var(--row) * 0.5 + env(safe-area-inset-bottom, 0px));
+    background: var(--bg);
+    border-top: 1px solid var(--border-subtle);
+  }
+  @media (max-width: 720px) {
+    .site-footer {
+      display: none;
+    }
+  }
+</style>
