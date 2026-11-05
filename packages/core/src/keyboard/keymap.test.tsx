@@ -23,10 +23,15 @@ interface Ctx {
 }
 
 const table: KeymapTable<Ctx> = {
-  app: baseAppBindings,
+  app: [
+    ...baseAppBindings,
+    { key: "x", cmd: "app.x", desc: "app x", help: "app-x" },
+  ],
   tree: [
     ...navBindings(),
     { key: "return", cmd: "tree.open", desc: "open", help: "open" },
+    // Shadows the app's `x` while the tree has focus.
+    { key: "x", cmd: "tree.x", desc: "tree x", help: "tree-x" },
   ],
   content: [
     ...navBindings(),
@@ -57,6 +62,7 @@ function TreePane(props: { log: string[] }) {
     "tree",
     {
       [BaseCommands.NAV_DOWN]: () => props.log.push("tree:down"),
+      "tree.x": () => props.log.push("tree:x"),
       "tree.open": () => {
         props.log.push("tree:open");
         setActivePane("content");
@@ -107,6 +113,7 @@ function Shell(props: { harness: (h: Harness) => void; ctx: () => Ctx }) {
       [BaseCommands.FOCUS_NEXT]: () => focus.cyclePane(),
       [BaseCommands.PALETTE_OPEN]: () => focus.openModal("palette"),
       [BaseCommands.HELP_OPEN]: () => log.push("help"),
+      "app.x": () => log.push("app:x"),
     },
     { target: () => layout },
   );
@@ -267,6 +274,22 @@ describe("keymap + focus", () => {
 
     await press(":");
     expect(texts()).toContain("edit");
+  });
+
+  test("a pane binding shadows the app binding for the same key, in dispatch and in the footer", async () => {
+    const { h, press } = await setup();
+    const texts = () => h.help().map((i) => i.text);
+
+    await press("x");
+    expect(h.log).toEqual(["tree:x"]);
+    expect(texts()).toContain("tree-x");
+    expect(texts()).not.toContain("app-x");
+
+    await press("TAB");
+    await press("x");
+    expect(h.log).toEqual(["tree:x", "app:x"]);
+    expect(texts()).toContain("app-x");
+    expect(texts()).not.toContain("tree-x");
   });
 
   test("a palette can dispatch a pane command against the active pane", async () => {
