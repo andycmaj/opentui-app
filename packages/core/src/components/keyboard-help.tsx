@@ -10,9 +10,16 @@ import { BaseCommands, ModalCommands } from "../keyboard/commands";
 import { navBindings, type BindingSpec, type Scope } from "../keyboard/keymap";
 import { useKeymapTable } from "../keyboard/keymap-context";
 import { getScopeBindings, mergeByCommand } from "../keyboard/keymap-utils";
-import { Modal, ModalHeader } from "./modal";
+import {
+  Modal,
+  ModalHeader,
+  resolvePadding,
+  type ModalSize,
+  type Padding,
+  type PaddingSides,
+} from "./modal";
 
-interface KeyboardHelpProps {
+export interface KeyboardHelpProps {
   onClose: () => void;
   // Map scope id -> section title. Scopes not listed use a title-cased id.
   scopeLabels?: Record<string, string>;
@@ -20,7 +27,17 @@ interface KeyboardHelpProps {
   scopeOrder?: Scope[];
   // A string renders as muted text; pass an element for richer content.
   footer?: JSX.Element;
+  // Passed through to Modal: md unless a size or an exact width is given.
+  size?: ModalSize;
+  width?: number;
+  padding?: Padding;
+  // Padding around the bindings list and around the footer. The header
+  // follows the horizontal part so its title lines up with the sections.
+  sectionPadding?: Padding;
 }
+
+// Two cells in from the sides, a blank row under each section.
+const SECTION_PADDING: PaddingSides = { top: 0, right: 2, bottom: 1, left: 2 };
 
 // The keys that open help also close it, alongside escape.
 const CLOSE_BINDINGS: BindingSpec[] = [
@@ -55,10 +72,15 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
   });
 
   const page = () => scrollRef?.viewport?.height ?? 8;
+  const section = createMemo(() =>
+    resolvePadding(props.sectionPadding, SECTION_PADDING),
+  );
 
   return (
     <Modal
-      size="md"
+      size={props.size ?? "md"}
+      width={props.width}
+      padding={props.padding}
       onClose={props.onClose}
       bindings={[...navBindings(), ...CLOSE_BINDINGS]}
       commands={{
@@ -70,13 +92,18 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
         [BaseCommands.SCROLL_PAGEUP]: () => scrollRef?.scrollBy(-page()),
       }}
     >
-      <ModalHeader title="Keyboard Shortcuts" hint="j/k scroll · esc/q/?" />
+      <ModalHeader
+        title="Keyboard Shortcuts"
+        hint="j/k scroll · esc/q/?"
+        paddingX={section().left}
+      />
       <scrollbox
         ref={(r: ScrollBoxRenderable) => (scrollRef = r)}
         maxHeight={16}
-        paddingLeft={2}
-        paddingRight={2}
-        paddingBottom={1}
+        paddingTop={section().top}
+        paddingRight={section().right}
+        paddingBottom={section().bottom}
+        paddingLeft={section().left}
       >
         <For each={groups()}>
           {(group) => (
@@ -101,13 +128,23 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
       <Switch>
         <Match when={typeof props.footer === "string" && props.footer}>
           {(text) => (
-            <box paddingLeft={2} paddingRight={2} paddingBottom={1}>
+            <box
+              paddingTop={section().top}
+              paddingRight={section().right}
+              paddingBottom={section().bottom}
+              paddingLeft={section().left}
+            >
               <text fg={theme.textMuted}>{text()}</text>
             </box>
           )}
         </Match>
         <Match when={props.footer}>
-          <box paddingLeft={2} paddingRight={2} paddingBottom={1}>
+          <box
+            paddingTop={section().top}
+            paddingRight={section().right}
+            paddingBottom={section().bottom}
+            paddingLeft={section().left}
+          >
             {props.footer}
           </box>
         </Match>

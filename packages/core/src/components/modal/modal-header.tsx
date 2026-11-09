@@ -6,6 +6,8 @@ import { useTheme } from "../../theme";
 interface ModalHeaderProps {
   title: string;
   hint?: string;
+  // Cells in from each side; default 2. Line it up with the body's padding.
+  paddingX?: number;
 }
 
 export function ModalHeader(props: ModalHeaderProps) {
@@ -13,8 +15,8 @@ export function ModalHeader(props: ModalHeaderProps) {
 
   return (
     <box
-      paddingLeft={2}
-      paddingRight={2}
+      paddingLeft={props.paddingX ?? 2}
+      paddingRight={props.paddingX ?? 2}
       paddingTop={1}
       flexDirection="row"
       justifyContent="space-between"

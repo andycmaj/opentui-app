@@ -175,6 +175,9 @@ function AppContent(props: AppContentProps) {
           onClose={closeModal}
           scopeLabels={{ app: "Global", list: "Task List", detail: "Detail" }}
           scopeOrder={["app", "list", "detail"]}
+          width={66}
+          padding={{ y: 1 }}
+          sectionPadding={{ x: 4, y: 1 }}
           footer="@andycmaj/opentui-app demo"
         />
       </Show>

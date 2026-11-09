@@ -10,10 +10,15 @@ export {
   Modal,
   ModalHeader,
   ModalFilterInput,
+  modalWidth,
+  resolvePadding,
   SIZE_CONFIG,
+  type ModalProps,
   type ModalSize,
+  type Padding,
+  type PaddingSides,
 } from "./modal";
 export { CommandPalette, type PaletteAction } from "./command-palette";
-export { KeyboardHelp } from "./keyboard-help";
+export { KeyboardHelp, type KeyboardHelpProps } from "./keyboard-help";
 export { Markdown, InlineSpans, decodeEntities, stripTags } from "./markdown";
 export * from "./log-view";
