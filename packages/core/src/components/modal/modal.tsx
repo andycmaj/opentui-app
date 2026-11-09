@@ -18,6 +18,7 @@ import {
   useTerminalSurface,
 } from "../../theme/context";
 import { getModalTheme } from "../../theme/theme";
+import { resolvePadding, type Padding } from "./padding";
 
 export type ModalSize = "sm" | "md" | "lg";
 
@@ -32,8 +33,20 @@ export const SIZE_CONFIG: Record<ModalSize, { width: number }> = {
 // Leave a couple of columns of breathing room on each side of the modal.
 const MODAL_MARGIN = 4;
 
-interface ModalProps {
+// The width a modal actually gets: the preferred width, narrowed to fit the
+// terminal but never below a usable minimum.
+export function modalWidth(preferred: number, terminalWidth: number): number {
+  const available = Math.max(20, terminalWidth - MODAL_MARGIN);
+  return Math.min(preferred, available);
+}
+
+export interface ModalProps {
   size?: ModalSize;
+  // An exact preferred width in cells, for when no size fits; wins over size.
+  // Still clamped to the terminal like the sizes are.
+  width?: number;
+  // Space between the modal's edge and its content. None by default.
+  padding?: Padding;
   onClose: () => void;
   children: JSX.Element;
   // Keys beyond escape (e.g. modalNavBindings) and their handlers. Keep keys
@@ -57,11 +70,13 @@ export function Modal(props: ModalProps) {
   const dimensions = useTerminalDimensions();
   const modalTheme = createMemo(() => getModalTheme(themeName(), terminal()));
 
-  const width = createMemo(() => {
-    const preferred = SIZE_CONFIG[props.size ?? "md"].width;
-    const available = Math.max(20, dimensions().width - MODAL_MARGIN);
-    return Math.min(preferred, available);
-  });
+  const width = createMemo(() =>
+    modalWidth(
+      props.width ?? SIZE_CONFIG[props.size ?? "md"].width,
+      dimensions().width,
+    ),
+  );
+  const padding = createMemo(() => resolvePadding(props.padding));
   const marginLeft = createMemo(() => -Math.floor(width() / 2));
 
   let box: BoxRenderable | undefined;
@@ -90,6 +105,10 @@ export function Modal(props: ModalProps) {
         left="50%"
         marginLeft={marginLeft()}
         width={width()}
+        paddingTop={padding().top}
+        paddingRight={padding().right}
+        paddingBottom={padding().bottom}
+        paddingLeft={padding().left}
         backgroundColor={modalTheme().contentPane}
         border={false}
         flexDirection="column"

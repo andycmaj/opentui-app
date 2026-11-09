@@ -99,6 +99,22 @@ The `Footer` and `CommandPalette` read the bindings reachable from the active
 pane, and `KeyboardHelp` reads the table, so a binding is described exactly
 once.
 
+`Modal` comes in `size` `sm`/`md`/`lg`, or takes an exact `width`; either is
+narrowed to fit the terminal. `padding` spaces its content from the edge — a
+number, or `{ x, y, top, right, bottom, left }` where a side wins over its axis.
+`KeyboardHelp` passes `size`, `width` and `padding` through and adds
+`sectionPadding` for the bindings list and the footer:
+
+```tsx
+<KeyboardHelp
+  onClose={closeModal}
+  width={66}
+  padding={{ y: 1 }}
+  sectionPadding={{ x: 4, y: 1 }}
+  footer={<Legend />}
+/>
+```
+
 ## The data seam
 
 The framework takes no position on _how_ you fetch. Implement `DataSource<T>`
