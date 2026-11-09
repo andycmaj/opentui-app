@@ -1,5 +1,11 @@
 import { describe, test, expect } from "bun:test";
-import { parseAnsi, stripAnsi, displayWidth } from "./ansi-parser";
+import {
+  parseAnsi,
+  stripAnsi,
+  displayWidth,
+  sanitizeControlChars,
+  sliceByDisplayPosition,
+} from "./ansi-parser";
 
 describe("parseAnsi", () => {
   test("returns single segment for plain text", () => {
@@ -185,5 +191,76 @@ describe("displayWidth", () => {
 
   test("returns 0 for only ANSI codes", () => {
     expect(displayWidth("\x1B[31m\x1B[0m")).toBe(0);
+  });
+});
+
+describe("sanitizeControlChars", () => {
+  const ESC = "\x1b";
+
+  test("leaves plain text alone", () => {
+    expect(sanitizeControlChars("hello world")).toBe("hello world");
+  });
+
+  test("keeps SGR sequences", () => {
+    const text = `${ESC}[31mred${ESC}[0m ${ESC}[38;2;0;255;0mgreen${ESC}[0m`;
+    expect(sanitizeControlChars(text)).toBe(text);
+  });
+
+  test("drops non-SGR CSI sequences", () => {
+    expect(sanitizeControlChars(`XXXX${ESC}[2Kerased`)).toBe("XXXXerased");
+    expect(sanitizeControlChars(`line2${ESC}[1Aup`)).toBe("line2up");
+    expect(sanitizeControlChars(`${ESC}[?25lhidden`)).toBe("hidden");
+  });
+
+  test("drops OSC sequences but keeps hyperlink text", () => {
+    expect(sanitizeControlChars(`${ESC}]0;TITLE\x07title set`)).toBe(
+      "title set",
+    );
+    expect(
+      sanitizeControlChars(
+        `${ESC}]8;;https://x.y${ESC}\\link${ESC}]8;;${ESC}\\ text`,
+      ),
+    ).toBe("link text");
+  });
+
+  test("drops other escape sequences", () => {
+    expect(sanitizeControlChars(`${ESC}7saved${ESC}8`)).toBe("saved");
+    expect(sanitizeControlChars(`${ESC}(Bcharset`)).toBe("charset");
+  });
+
+  test("expands tabs to 8-column stops, ignoring SGR width", () => {
+    expect(sanitizeControlChars("a\tb")).toBe("a       b");
+    expect(sanitizeControlChars("\tat Foo")).toBe("        at Foo");
+    expect(sanitizeControlChars(`${ESC}[31mab${ESC}[0m\tc`)).toBe(
+      `${ESC}[31mab${ESC}[0m      c`,
+    );
+  });
+
+  test("applies backspace to the previous character", () => {
+    expect(sanitizeControlChars("back\bspace")).toBe("bacspace");
+    expect(sanitizeControlChars("\bx")).toBe("x");
+  });
+
+  test("strips remaining control characters", () => {
+    expect(sanitizeControlChars("bell\x07here")).toBe("bellhere");
+    expect(sanitizeControlChars("a\x00b\x7fc\x0bd")).toBe("abcd");
+  });
+});
+
+describe("wide characters", () => {
+  test("displayWidth counts CJK and emoji as two cells", () => {
+    expect(displayWidth("漢字")).toBe(4);
+    expect(displayWidth("a🚀b")).toBe(4);
+    expect(displayWidth("\x1b[31m漢\x1b[0m")).toBe(2);
+  });
+
+  test("sliceByDisplayPosition uses cell positions", () => {
+    expect(sliceByDisplayPosition("a漢b", 1, 3)).toBe("漢");
+    expect(sliceByDisplayPosition("a漢b", 3)).toBe("b");
+    expect(sliceByDisplayPosition("🚀x", 2)).toBe("x");
+  });
+
+  test("tab stops account for wide characters", () => {
+    expect(sanitizeControlChars("漢\tx")).toBe("漢      x");
   });
 });

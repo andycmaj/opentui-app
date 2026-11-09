@@ -1,5 +1,6 @@
 // ANSI escape code parser for preserving terminal colors in log rendering
 
+import { parse } from "@ansi-tools/parser";
 import { RGBA } from "@opentui/core";
 
 export interface AnsiSegment {
@@ -179,12 +180,18 @@ export function stripAnsi(text: string): string {
   return text.replace(/\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g, "");
 }
 
+// Terminal cells a single code point occupies. Wrapping, selection and drawing
+// must all agree on this, or a wide glyph shifts the rest of the row on screen
+// while opentui's frame still has it one cell over.
+export function cellWidth(char: string): number {
+  return Bun.stringWidth(char);
+}
+
 /**
  * Calculate the display width of text, ignoring ANSI escape sequences.
- * Note: Does not handle wide characters (CJK, emoji) - assumes 1 char = 1 cell.
  */
 export function displayWidth(text: string): number {
-  return stripAnsi(text).length;
+  return Bun.stringWidth(stripAnsi(text));
 }
 
 /**
@@ -202,9 +209,7 @@ export function sliceByDisplayPosition(
   let visualPos = 0;
   let inEscape = false;
 
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-
+  for (const char of text) {
     if (char === "\x1B") {
       inEscape = true;
       continue;
@@ -222,8 +227,50 @@ export function sliceByDisplayPosition(
       result.push(char);
     }
 
-    visualPos++;
+    visualPos += cellWidth(char);
   }
 
   return result.join("");
+}
+
+const TAB_WIDTH = 8;
+
+// Log text is drawn cell by cell, and only SGR is interpreted. Any other
+// control sequence would land in a cell and reach the terminal raw, moving
+// its cursor (or advancing it more than one cell) so the screen no longer
+// matches opentui's diffed frame until a full repaint.
+export function sanitizeControlChars(text: string): string {
+  let out = "";
+  let col = 0;
+  // The last printable char in `out`, so backspace can erase it.
+  let lastChar = "";
+
+  for (const code of parse(text)) {
+    if (code.type === "CSI" && code.command === "m") {
+      out += code.raw;
+      continue;
+    }
+    if (code.type !== "TEXT") continue;
+
+    for (const ch of code.raw) {
+      const cp = ch.codePointAt(0) ?? 0;
+      if (ch === "\t") {
+        const width = TAB_WIDTH - (col % TAB_WIDTH);
+        out += " ".repeat(width);
+        col += width;
+        lastChar = "";
+      } else if (ch === "\b") {
+        if (lastChar) {
+          out = out.slice(0, -lastChar.length);
+          col -= cellWidth(lastChar);
+          lastChar = "";
+        }
+      } else if (cp >= 0x20 && !(cp >= 0x7f && cp <= 0x9f)) {
+        out += ch;
+        col += cellWidth(ch);
+        lastChar = ch;
+      }
+    }
+  }
+  return out;
 }

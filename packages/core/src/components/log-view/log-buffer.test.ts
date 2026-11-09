@@ -49,6 +49,57 @@ describe("LogBuffer", () => {
     });
   });
 
+  describe("control characters", () => {
+    // Anything but SGR that reaches a cell is written to the terminal raw and
+    // desyncs it from opentui's diffed frame.
+    test("display rows contain only printable text and SGR", () => {
+      buffer.showTimestamps = false;
+      buffer.appendLines([
+        makeLine("a\tb"),
+        makeLine("XX\x1b[2Kerased"),
+        makeLine("\x1b]0;title\x07bell\x07here"),
+        makeLine("\x1b[31mred\x1b[0m"),
+      ]);
+
+      const texts = buffer.getVisibleRows().map((r) => r.text);
+      expect(texts).toEqual([
+        "a       b",
+        "XXerased",
+        "bellhere",
+        "\x1b[31mred\x1b[0m",
+      ]);
+    });
+
+    test("wraps wide characters by cell width", () => {
+      buffer.showTimestamps = false;
+      buffer.width = 11;
+      // 10 usable cells: five CJK chars fill a row exactly
+      buffer.appendLines([makeLine("漢字漢字漢字")]);
+
+      const rows = buffer.getVisibleRows();
+      expect(rows.map((r) => r.text)).toEqual(["漢字漢字漢", "↳ 字"]);
+    });
+
+    test("makes progress when a wide char exceeds the row width", () => {
+      buffer.showTimestamps = false;
+      // 3 usable cells; continuation rows get 1 after the "↳ " prefix
+      buffer.width = 4;
+      buffer.appendLines([makeLine("ab漢字")]);
+
+      const rows = buffer.getVisibleRows();
+      expect(rows.map((r) => r.text)).toEqual(["ab", "↳ 漢", "↳ 字"]);
+    });
+
+    test("wraps using expanded tab width", () => {
+      buffer.showTimestamps = false;
+      buffer.width = 20;
+      buffer.appendLines([makeLine("\t\tabcdefgh")]);
+
+      const rows = buffer.getVisibleRows();
+      expect(rows.length).toBe(2);
+    });
+  });
+
   describe("word wrapping", () => {
     test("does not wrap short lines", () => {
       buffer.appendLines([makeLine("Short line")]);
