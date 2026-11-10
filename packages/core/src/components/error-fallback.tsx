@@ -17,6 +17,8 @@ export function ErrorFallback(props: ErrorFallbackProps) {
 
   const handleKey = (key: KeyEvent) => {
     if (key.name === "q" || (key.ctrl && key.name === "c")) {
+      // Set before destroy: runApp may exit from onDestroy with this code.
+      process.exitCode = 1;
       renderer.destroy();
       process.exit(1);
     }

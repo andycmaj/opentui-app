@@ -77,9 +77,9 @@ function AppContent(props: AppContentProps) {
 
   onMount(() => void data.refresh());
 
+  // runApp exits once the renderer is destroyed.
   function quit() {
     renderer.destroy();
-    process.exit(0);
   }
 
   function refresh() {
