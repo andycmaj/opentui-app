@@ -52,6 +52,19 @@ await runApp(() => (
 ));
 ```
 
+`runApp` exits the process once the renderer is destroyed, whether by your
+quit command (`renderer.destroy()`) or by a signal such as SIGHUP when the
+terminal or tmux window closes. opentui answers those signals by destroying the
+renderer only, so without the exit an app with live timers would keep running
+headless. The exit code is 128 + signal number for a signal, else
+`process.exitCode`, else 0. Put cleanup in `onDestroy` (it runs first, after the
+terminal is restored); pass `exitOnDestroy: false` to exit yourself, e.g. after
+async cleanup:
+
+```tsx
+await runApp(() => <App />, { onDestroy: () => engine.stop() });
+```
+
 Keybindings are one declarative table, keyed by scope. `app` applies anywhere
 in the pane layout; a pane's scope applies while focus is within that pane:
 

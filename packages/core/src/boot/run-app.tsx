@@ -11,6 +11,7 @@ import {
   setGlobalRenderer,
   installProcessErrorHandlers,
 } from "./global-renderer";
+import { destroyExitCode, recordExitSignal } from "./exit-on-destroy";
 
 export interface RunAppOptions {
   targetFps?: number;
@@ -20,7 +21,15 @@ export interface RunAppOptions {
   debugConsoleKey?: string | null;
   startInDebugMode?: boolean;
   consolePosition?: ConsolePosition;
+  // Runs once the renderer is destroyed and the terminal restored: stop timers,
+  // flush state. Synchronous; for async cleanup set exitOnDestroy: false and
+  // exit yourself when done.
   onDestroy?: () => void;
+  // Exit the process after onDestroy. Default true: opentui's signal handlers
+  // only destroy the renderer, so without this a signal (closed terminal, tmux
+  // kill) leaves an app with live timers running headless. Exits 128+signal
+  // for a signal, else process.exitCode, else 0.
+  exitOnDestroy?: boolean;
 }
 
 // Registers the renderer globally and wires the debug-console toggle. Rendered
@@ -58,6 +67,9 @@ export function runApp(
 ): Promise<void> {
   installProcessErrorHandlers();
 
+  const exitOnDestroy = options.exitOnDestroy ?? true;
+  const exitSignal = exitOnDestroy ? recordExitSignal() : null;
+
   const debugConsoleKey =
     options.debugConsoleKey === undefined ? "`" : options.debugConsoleKey;
 
@@ -73,7 +85,7 @@ export function runApp(
     );
   }
 
-  return render(RootApp, {
+  const rendered = render(RootApp, {
     targetFps: options.targetFps ?? 30,
     exitOnCtrlC: options.exitOnCtrlC ?? false,
     consoleOptions: {
@@ -82,7 +94,21 @@ export function runApp(
     },
     onDestroy: () => {
       setGlobalRenderer(null);
-      options.onDestroy?.();
+      if (!exitSignal) {
+        options.onDestroy?.();
+        return;
+      }
+      exitSignal.dispose();
+      try {
+        options.onDestroy?.();
+      } catch (e) {
+        console.error("Error in onDestroy:", e);
+        process.exitCode = 1;
+      }
+      process.exit(destroyExitCode(exitSignal.signal(), process.exitCode));
     },
   });
+  // No renderer means no destroy to clean up after.
+  rendered.catch(() => exitSignal?.dispose());
+  return rendered;
 }

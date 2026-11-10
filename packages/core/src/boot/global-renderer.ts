@@ -18,6 +18,9 @@ export function getGlobalRenderer(): RendererLike | null {
 // Destroy the renderer (best-effort) and exit. Used for unrecoverable errors.
 export function emergencyExit(error: unknown, source: string): never {
   console.error(`[${source}]`, error);
+  // runApp exits from the renderer's onDestroy by default; set the code first
+  // so that exit reports the failure rather than a clean quit.
+  process.exitCode = 1;
   const renderer = getGlobalRenderer();
   if (renderer) {
     try {
