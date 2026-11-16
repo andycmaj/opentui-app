@@ -58,9 +58,10 @@ export interface HelpBinding<Ctx = unknown> {
 
 /**
  * Bindings reachable from `focused` (the current focus when omitted), in
- * dispatch order: the innermost layer first, then enclosing layers. A key bound
- * by an inner layer shadows the same key in outer layers, so only the binding
- * that would actually run is returned.
+ * dispatch order: the innermost layer first, then enclosing layers. Every
+ * binding is returned, including ones an earlier binding on the same key
+ * shadows: which one runs can depend on `relevant`, so shadowing is left to
+ * `dropShadowed` after relevance filtering.
  */
 export function reachableBindings(
   keymap: AppKeymap,
@@ -72,7 +73,6 @@ export function reachableBindings(
       : { visibility: "reachable", focused },
   );
   const result: HelpBinding[] = [];
-  const claimed = new Set<string>();
   for (const entry of entries) {
     for (const binding of entry.bindings) {
       const stroke = binding.sequence[0]?.stroke;
@@ -80,8 +80,6 @@ export function reachableBindings(
       const keys = binding.sequence
         .map((part) => formatStroke(part.stroke))
         .join("");
-      if (claimed.has(keys)) continue;
-      claimed.add(keys);
       const attrs = binding.attrs ?? {};
       result.push({
         cmd: entry.command.name,
@@ -138,6 +136,24 @@ export function filterRelevant<Ctx>(
   ctx: Ctx,
 ): HelpBinding<Ctx>[] {
   return bindings.filter((b) => b.relevant?.(ctx) ?? true);
+}
+
+/**
+ * Keep the first binding per key, given bindings in dispatch order: an inner
+ * layer's key shadows the same key in outer layers. Filter by relevance first.
+ * Apps bind one key to several commands whose handlers decline rows they don't
+ * apply to, and dispatch falls through those, so an irrelevant binding must not
+ * claim the key from the one that would actually run.
+ */
+export function dropShadowed<Ctx>(
+  bindings: HelpBinding<Ctx>[],
+): HelpBinding<Ctx>[] {
+  const claimed = new Set<string>();
+  return bindings.filter((b) => {
+    if (claimed.has(b.keys)) return false;
+    claimed.add(b.keys);
+    return true;
+  });
 }
 
 export interface HelpItem {

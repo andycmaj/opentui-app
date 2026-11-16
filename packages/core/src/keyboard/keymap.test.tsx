@@ -36,6 +36,14 @@ const table: KeymapTable<Ctx> = {
   content: [
     ...navBindings(),
     { key: "return", cmd: "content.activate", desc: "activate" },
+    // Shares `e` with content.edit; each applies to rows the other declines.
+    {
+      key: "e",
+      cmd: "content.view",
+      desc: "view",
+      help: "view",
+      relevant: (ctx) => !ctx.editable,
+    },
     {
       key: "e",
       cmd: "content.edit",
@@ -77,13 +85,18 @@ function TreePane(props: { log: string[] }) {
   );
 }
 
-function ContentPane(props: { log: string[] }) {
+function ContentPane(props: { log: string[]; ctx: () => Ctx }) {
   let el: Renderable | undefined;
   useScope(
     "content",
     {
       [BaseCommands.NAV_DOWN]: () => props.log.push("content:down"),
       "content.activate": () => props.log.push("content:activate"),
+      "content.view": () => {
+        if (props.ctx().editable) return false;
+        props.log.push("content:view");
+        return true;
+      },
       "content.edit": () => props.log.push("content:edit"),
     },
     { target: () => el },
@@ -130,7 +143,7 @@ function Shell(props: { harness: (h: Harness) => void; ctx: () => Ctx }) {
     <box flexDirection="column">
       <box ref={(r: Renderable) => (layout = r)} flexDirection="row">
         <TreePane log={log} />
-        <ContentPane log={log} />
+        <ContentPane log={log} ctx={props.ctx} />
       </box>
       <Show when={focus.activeModal() === "palette"}>
         <Modal
@@ -290,6 +303,24 @@ describe("keymap + focus", () => {
     expect(h.log).toEqual(["tree:x", "app:x"]);
     expect(texts()).toContain("app-x");
     expect(texts()).not.toContain("tree-x");
+  });
+
+  test("a key's relevant binding wins over an earlier one that declines this row", async () => {
+    let editable = false;
+    const { h, press } = await setup(() => ({ editable }));
+    const texts = () => h.help().map((i) => i.text);
+    await press("TAB");
+
+    expect(texts()).toContain("view");
+    expect(texts()).not.toContain("edit");
+    await press("e");
+    expect(h.log).toEqual(["content:view"]);
+
+    editable = true;
+    expect(texts()).toContain("edit");
+    expect(texts()).not.toContain("view");
+    await press("e");
+    expect(h.log).toEqual(["content:view", "content:edit"]);
   });
 
   test("a palette can dispatch a pane command against the active pane", async () => {

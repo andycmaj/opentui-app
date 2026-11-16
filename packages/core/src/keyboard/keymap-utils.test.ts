@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  dropShadowed,
   filterRelevant,
   formatKey,
   getHelpItems,
@@ -101,5 +102,45 @@ describe("filterRelevant", () => {
       filterRelevant(bindings, ctx).map((b) => b.keys);
     expect(keys({ editable: true })).toEqual(["a", "e"]);
     expect(keys({ editable: false })).toEqual(["a"]);
+  });
+});
+
+describe("dropShadowed", () => {
+  type Ctx = { row: "task" | "idea" };
+  const bindings: HelpBinding<Ctx>[] = [
+    // Inner pane layer: one key, several commands, each for its own rows.
+    {
+      cmd: "task.reject",
+      keys: "x",
+      desc: "not a task",
+      relevant: (ctx) => ctx.row === "task",
+    },
+    {
+      cmd: "idea.dismiss",
+      keys: "x",
+      desc: "dismiss idea",
+      relevant: (ctx) => ctx.row === "idea",
+    },
+    { cmd: "pane.sort", keys: "s", desc: "sort pane" },
+    // Outer app layer.
+    { cmd: "app.sort", keys: "s", desc: "sort app" },
+    { cmd: "app.quit", keys: "q", desc: "quit" },
+  ];
+  const visible = (ctx: Ctx) =>
+    dropShadowed(filterRelevant(bindings, ctx)).map((b) => b.cmd);
+
+  test("lists the binding relevant to this row when an earlier one on the key is not", () => {
+    expect(visible({ row: "task" })).toContain("task.reject");
+    expect(visible({ row: "task" })).not.toContain("idea.dismiss");
+    expect(visible({ row: "idea" })).toContain("idea.dismiss");
+    expect(visible({ row: "idea" })).not.toContain("task.reject");
+  });
+
+  test("an inner binding still shadows an outer one when both are relevant", () => {
+    expect(visible({ row: "task" })).toEqual([
+      "task.reject",
+      "pane.sort",
+      "app.quit",
+    ]);
   });
 });
