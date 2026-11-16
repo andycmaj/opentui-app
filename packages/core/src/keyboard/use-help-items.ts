@@ -1,11 +1,12 @@
 // Live footer hints: the bindings reachable from the active pane, filtered by
-// the app's help context. Queried against the pane rather than real focus so
+// the app's help context, then by key shadowing. Queried against the pane rather than real focus so
 // the hints stay put while a modal holds focus.
 
 import type { Accessor } from "solid-js";
 import { useKeymapSelector } from "@opentui/keymap/solid";
 import { useFocus } from "../context/focus";
 import {
+  dropShadowed,
   filterRelevant,
   getHelpItems,
   reachableBindings,
@@ -31,9 +32,7 @@ export function useHelpItems<Ctx>(
   const bindings = useReachableBindings();
   return () => {
     const all = bindings();
-    return getHelpItems(
-      ctx ? filterRelevant<unknown>(all, ctx()) : all,
-      options,
-    );
+    const relevant = ctx ? filterRelevant<unknown>(all, ctx()) : all;
+    return getHelpItems(dropShadowed(relevant), options);
   };
 }

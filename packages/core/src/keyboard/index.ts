@@ -8,6 +8,7 @@ export {
   modalNavBindings,
 } from "./keymap";
 export {
+  dropShadowed,
   filterRelevant,
   formatKey,
   formatStroke,
