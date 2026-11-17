@@ -103,6 +103,11 @@ return (
 );
 ```
 
+`cyclePane` (the usual `FOCUS_NEXT` handler, on `Tab`) walks the `panes` list in order and
+skips any pane that isn't mounted, so a pane you render only sometimes needs no
+special handling. The first pane is the sidebar and is never skipped: cycling to
+it re-shows a hidden sidebar.
+
 A key reaches exactly one handler: the innermost focused scope, then the app
 scope. `Modal` takes focus into its own high-priority layer, so pane and app
 keys are unreachable while it's open, and typing in its filter input never

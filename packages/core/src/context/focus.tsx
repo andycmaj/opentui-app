@@ -135,14 +135,27 @@ export function FocusProvider(props: ParentProps<{ panes?: string[] }>) {
     ),
   );
 
+  function isMounted(pane: string): boolean {
+    const target = targets().get(pane);
+    return !!target && !target.isDestroyed;
+  }
+
   function cyclePane() {
     const idx = panes.indexOf(state.activePane);
-    const next = panes[(idx + 1) % panes.length];
-    // Expand the sidebar when focusing the sidebar pane.
-    if (next === sidebarPane && !sidebarOpen()) {
-      setSidebarOpen(true);
+    // Skip panes that aren't mounted (one an app only renders sometimes), or
+    // focus would land nowhere until the next cycle. The sidebar pane always
+    // counts: cycling to it re-shows a hidden sidebar, which mounts afterwards.
+    // It is in every lap, so the walk always ends within one.
+    for (let step = 1; step <= panes.length; step++) {
+      const next = panes[(idx + step) % panes.length];
+      if (next === sidebarPane) {
+        if (!sidebarOpen()) setSidebarOpen(true);
+      } else if (!isMounted(next)) {
+        continue;
+      }
+      focusPane(next);
+      return;
     }
-    focusPane(next);
   }
 
   function toggleSidebar() {
