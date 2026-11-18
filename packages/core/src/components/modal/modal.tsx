@@ -1,8 +1,9 @@
 // Shared modal shell - consistent positioning, opaque surface, escape-to-close.
 // The modal's box takes focus on mount and owns a high-priority keymap layer,
-// so while it's open the pane and app bindings are out of reach.
+// so while it's open the pane and app bindings are out of reach. A border and a
+// backdrop set it apart from the screen behind (see chrome.ts).
 
-import { createMemo, onMount, type JSX } from "solid-js";
+import { createMemo, onCleanup, onMount, type JSX } from "solid-js";
 import type { BoxRenderable } from "@opentui/core";
 import { useTerminalDimensions } from "@opentui/solid";
 import { ModalCommands } from "../../keyboard/commands";
@@ -14,10 +15,13 @@ import {
 } from "../../keyboard/use-scope";
 import {
   ThemeContext,
+  useTheme,
   useThemeName,
   useTerminalSurface,
 } from "../../theme/context";
 import { getModalTheme } from "../../theme/theme";
+import { BORDER_CELLS, backdropColor, modalBorder } from "./chrome";
+import { pushModalLayer } from "./modal-stack";
 import { resolvePadding, type Padding } from "./padding";
 
 export type ModalSize = "sm" | "md" | "lg";
@@ -47,6 +51,12 @@ export interface ModalProps {
   width?: number;
   // Space between the modal's edge and its content. None by default.
   padding?: Padding;
+  // A rounded accent border, added outside the width so content keeps its
+  // room. On by default; false for the old borderless card.
+  border?: boolean;
+  // Fade the screen behind toward the app background. On by default; has no
+  // effect under transparent themes.
+  backdrop?: boolean;
   onClose: () => void;
   children: JSX.Element;
   // Keys beyond escape (e.g. modalNavBindings) and their handlers. Keep keys
@@ -65,14 +75,19 @@ export function Modal(props: ModalProps) {
   // Modals are overlays, so they need an opaque surface even when the active
   // theme is transparent; getModalTheme is a no-op for opaque themes. The
   // surface adapts to the detected terminal colors once available.
+  const appTheme = useTheme();
   const themeName = useThemeName();
   const terminal = useTerminalSurface();
   const dimensions = useTerminalDimensions();
   const modalTheme = createMemo(() => getModalTheme(themeName(), terminal()));
+  const layer = pushModalLayer();
+  onCleanup(layer.release);
 
+  const bordered = (): boolean => props.border !== false;
   const width = createMemo(() =>
     modalWidth(
-      props.width ?? SIZE_CONFIG[props.size ?? "md"].width,
+      (props.width ?? SIZE_CONFIG[props.size ?? "md"].width) +
+        (bordered() ? BORDER_CELLS : 0),
       dimensions().width,
     ),
   );
@@ -95,25 +110,38 @@ export function Modal(props: ModalProps) {
   // short defer, and keys in between must not reach the pane behind.
   onMount(() => box?.focus());
 
+  // The backdrop box covers the modal's parent (the app root, in practice),
+  // the same area the card centers itself in.
   return (
     <ThemeContext.Provider value={modalTheme()}>
       <box
-        ref={(r: BoxRenderable) => (box = r)}
-        focusable
         position="absolute"
-        top={2}
-        left="50%"
-        marginLeft={marginLeft()}
-        width={width()}
-        paddingTop={padding().top}
-        paddingRight={padding().right}
-        paddingBottom={padding().bottom}
-        paddingLeft={padding().left}
-        backgroundColor={modalTheme().contentPane}
-        border={false}
-        flexDirection="column"
+        top={0}
+        left={0}
+        width="100%"
+        height="100%"
+        backgroundColor={
+          props.backdrop === false ? "transparent" : backdropColor(appTheme)
+        }
       >
-        {props.children}
+        <box
+          ref={(r: BoxRenderable) => (box = r)}
+          focusable
+          position="absolute"
+          top={2}
+          left="50%"
+          marginLeft={marginLeft()}
+          width={width()}
+          paddingTop={padding().top}
+          paddingRight={padding().right}
+          paddingBottom={padding().bottom}
+          paddingLeft={padding().left}
+          backgroundColor={modalTheme().contentPane}
+          flexDirection="column"
+          {...modalBorder(modalTheme(), layer.isTop(), bordered())}
+        >
+          {props.children}
+        </box>
       </box>
     </ThemeContext.Provider>
   );
