@@ -1,13 +1,13 @@
 // Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
-exports[`Modal chrome default: rounded accent border around an untouched content width 1`] = `
+exports[`Modal chrome default: accent frame around an untouched content width 1`] = `
 "behind the modalbehind the modalbehind the modalbehind the modalbehind the      
 behind the modalbehind the modalbehind the modalbehind the modalbehind the      
-behind the mod╭──────────────────────────────────────────────────╮hind the      
-behind the mod│                                                  │hind the      
-behind the mod│  Title                                      esc  │hind the      
-behind the mod│body                                              │hind the      
-behind the mod╰──────────────────────────────────────────────────╯hind the      
+behind the mod▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔hind the      
+behind the mod▏                                                  ▕hind the      
+behind the mod▏  Title                                      esc  ▕hind the      
+behind the mod▏body                                              ▕hind the      
+behind the mod▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁hind the      
 behind the modalbehind the modalbehind the modalbehind the modalbehind the      
 behind the modalbehind the modalbehind the modalbehind the modalbehind the      
 behind the modalbehind the modalbehind the modalbehind the modalbehind the      
@@ -39,27 +39,27 @@ behind the modalbehind the modalbehind the modalbehind the modalbehind the
 exports[`Modal chrome a popup over a modal: only the top one wears the accent 1`] = `
 "behind the modalbehind the modalbehind the modalbehind the modalbehind the      
 behind the modalbehind the modalbehind the modalbehind the modalbehind the      
-behind th╭──────────────╭──────────────────────────────╮──────────────╮the      
-behind th│              │                              │              │the      
-behind th│  Under       │                              │         esc  │the      
-behind th│              │                              │              │the      
-behind th│              │                              │              │the      
-behind th│              │  Popup                  esc  │              │the      
-behind th│              ╰──────────────────────────────╯              │the      
-behind th│                                                            │the      
-behind th│                                                            │the      
-behind th│                                                            │the      
-behind th│                                                            │the      
-behind th╰────────────────────────────────────────────────────────────╯the      
+behind th▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔the      
+behind th▏              ▏                              ▕              ▕the      
+behind th▏  Under       ▏                              ▕         esc  ▕the      
+behind th▏              ▏                              ▕              ▕the      
+behind th▏              ▏                              ▕              ▕the      
+behind th▏              ▏  Popup                  esc  ▕              ▕the      
+behind th▏              ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁              ▕the      
+behind th▏                                                            ▕the      
+behind th▏                                                            ▕the      
+behind th▏                                                            ▕the      
+behind th▏                                                            ▕the      
+behind th▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁the      
 "
 `;
 
 exports[`Modal chrome narrow terminal: the bordered card still fits 1`] = `
 "behind the modalbehind the    
 behind the modalbehind the    
-be╭────────────────────────╮  
-be│body                    │  
-be╰────────────────────────╯  
+be▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔  
+be▏body                    ▕  
+be▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  
 behind the modalbehind the    
 behind the modalbehind the    
 behind the modalbehind the    

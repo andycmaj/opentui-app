@@ -3,8 +3,14 @@
 // so while it's open the pane and app bindings are out of reach. A border and a
 // backdrop set it apart from the screen behind (see chrome.ts).
 
-import { createMemo, onCleanup, onMount, type JSX } from "solid-js";
-import type { BoxRenderable } from "@opentui/core";
+import {
+  createEffect,
+  createMemo,
+  onCleanup,
+  onMount,
+  type JSX,
+} from "solid-js";
+import type { BoxRenderable, OptimizedBuffer } from "@opentui/core";
 import { useTerminalDimensions } from "@opentui/solid";
 import { ModalCommands } from "../../keyboard/commands";
 import type { BindingSpec } from "../../keyboard/keymap";
@@ -20,7 +26,12 @@ import {
   useTerminalSurface,
 } from "../../theme/context";
 import { getModalTheme } from "../../theme/theme";
-import { BORDER_CELLS, backdropColor, modalBorder } from "./chrome";
+import {
+  BORDER_CELLS,
+  backdropColor,
+  drawFrame,
+  modalBorderColor,
+} from "./chrome";
 import { pushModalLayer } from "./modal-stack";
 import { resolvePadding, type Padding } from "./padding";
 
@@ -51,8 +62,8 @@ export interface ModalProps {
   width?: number;
   // Space between the modal's edge and its content. None by default.
   padding?: Padding;
-  // A rounded accent border, added outside the width so content keeps its
-  // room. On by default; false for the old borderless card.
+  // A thin accent frame, added outside the width so content keeps its room.
+  // On by default; false for the old borderless card.
   border?: boolean;
   // Fade the screen behind toward the app background. On by default; has no
   // effect under transparent themes.
@@ -91,7 +102,20 @@ export function Modal(props: ModalProps) {
       dimensions().width,
     ),
   );
-  const padding = createMemo(() => resolvePadding(props.padding));
+  // The frame is drawn over a one-cell ring of padding, outside the caller's.
+  const padding = createMemo(() => {
+    const p = resolvePadding(props.padding);
+    const ring = bordered() ? 1 : 0;
+    return {
+      top: p.top + ring,
+      right: p.right + ring,
+      bottom: p.bottom + ring,
+      left: p.left + ring,
+    };
+  });
+  const frameColor = createMemo(() =>
+    modalBorderColor(modalTheme(), layer.isTop()),
+  );
   const marginLeft = createMemo(() => -Math.floor(width() / 2));
 
   let box: BoxRenderable | undefined;
@@ -109,6 +133,18 @@ export function Modal(props: ModalProps) {
   // Take focus synchronously: a filter input inside only focuses after a
   // short defer, and keys in between must not reach the pane behind.
   onMount(() => box?.focus());
+
+  // The frame is drawn imperatively, so a color change (a popup opening over
+  // this modal, a theme switch) has to ask for a repaint itself.
+  createEffect(() => {
+    frameColor();
+    box?.requestRender();
+  });
+
+  function renderFrame(this: BoxRenderable, buffer: OptimizedBuffer): void {
+    if (!bordered()) return;
+    drawFrame(buffer, this, frameColor(), modalTheme().contentPane);
+  }
 
   // The backdrop box covers the modal's parent (the app root, in practice),
   // the same area the card centers itself in.
@@ -137,8 +173,9 @@ export function Modal(props: ModalProps) {
           paddingBottom={padding().bottom}
           paddingLeft={padding().left}
           backgroundColor={modalTheme().contentPane}
+          border={false}
           flexDirection="column"
-          {...modalBorder(modalTheme(), layer.isTop(), bordered())}
+          renderAfter={renderFrame}
         >
           {props.children}
         </box>

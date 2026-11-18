@@ -10,7 +10,7 @@ import { KeymapProvider } from "../../keyboard/keymap-context";
 import { baseAppBindings, type KeymapTable } from "../../keyboard/keymap";
 import { Modal } from "./modal";
 import { ModalHeader } from "./modal-header";
-import { BACKDROP_ALPHA } from "./chrome";
+import { BACKDROP_ALPHA, FRAME } from "./chrome";
 
 const table: KeymapTable = { app: baseAppBindings };
 const BEHIND = "behind the modal";
@@ -64,10 +64,15 @@ async function render(
 }
 
 const ints = (hex: string): number[] => RGBA.fromHex(hex).toInts();
+// Corners reuse the line glyphs, so a card's edges are its first and last.
+const edges = (line: string, glyph: string): [number, number] => [
+  line.indexOf(glyph),
+  line.lastIndexOf(glyph),
+];
 const close = (): void => {};
 
 describe("Modal chrome", () => {
-  test("default: rounded accent border around an untouched content width", async () => {
+  test("default: accent frame around an untouched content width", async () => {
     const { lines, cell } = await render(() => (
       <Modal size="sm" onClose={close}>
         <ModalHeader title="Title" />
@@ -75,14 +80,17 @@ describe("Modal chrome", () => {
       </Modal>
     ));
     expect(lines.join("\n")).toMatchSnapshot();
-    // sm is 50 wide; the border sits outside it, so the card is 52.
-    const top = lines[2];
-    const left = top.indexOf("╭");
-    expect(top.indexOf("╮") - left + 1).toBe(52);
-    expect(lines[lines.findIndex((l) => l.includes("body")) + 1]).toContain(
-      "╰",
-    );
+    // sm is 50 wide; the frame sits outside it, so the card is 52.
+    const [left, right] = edges(lines[2], FRAME.top);
+    expect(right - left + 1).toBe(52);
+    const bottom = lines.findIndex((l) => l.includes("body")) + 1;
+    expect(edges(lines[bottom], FRAME.bottom)).toEqual([left, right]);
+    expect(lines[3][left]).toBe(FRAME.left);
+    expect(lines[3][right]).toBe(FRAME.right);
     expect(cell(left, 2).fg).toEqual(ints(defaultTheme.borderActive!));
+    // The line hugs the top edge of a cell painted in the card's surface, so
+    // the card ends exactly at the line.
+    expect(cell(left + 1, 2).bg).toEqual(ints(defaultTheme.contentPane));
   });
 
   test("default: the screen behind fades toward the app background", async () => {
@@ -107,7 +115,8 @@ describe("Modal chrome", () => {
       </Modal>
     ));
     expect(lines.join("\n")).toMatchSnapshot();
-    expect(lines.join("")).not.toContain("╭");
+    expect(lines.join("")).not.toContain(FRAME.top);
+    expect(lines.join("")).not.toContain(FRAME.left);
     expect(cell(0, 0).fg).toEqual(ints("#eeeeee"));
     // Card is exactly the preferred width, so content starts at its edge.
     expect(lines[2].indexOf("body")).toBe(40 - 25);
@@ -134,8 +143,9 @@ describe("Modal chrome", () => {
     );
     expect(lines.join("\n")).toMatchSnapshot();
     // Both cards open at the same top row; the popup is the inner corner.
-    const under = lines[2].indexOf("╭");
-    const popupLeft = lines[2].indexOf("╭", under + 1);
+    // Their top lines run together, so find each card by its left side bar.
+    const under = lines[3].indexOf(FRAME.left);
+    const popupLeft = lines[3].indexOf(FRAME.left, under + 1);
     const accent = ints(defaultTheme.borderActive!);
     expect(cell(popupLeft, 2).fg).toEqual(accent);
     // The modal underneath is both demoted to the plain border and faded by
@@ -153,7 +163,7 @@ describe("Modal chrome", () => {
       ),
       { theme: "terminal" },
     );
-    expect(lines[2]).toContain("╭");
+    expect(lines[2]).toContain(FRAME.top);
     expect(cell(0, 0).fg).toEqual(ints("#eeeeee"));
   });
 
@@ -167,8 +177,8 @@ describe("Modal chrome", () => {
       { width: 30 },
     );
     expect(lines.join("\n")).toMatchSnapshot();
-    const top = lines[2];
-    expect(top.indexOf("╭")).toBeGreaterThanOrEqual(0);
-    expect(top.indexOf("╮")).toBeLessThan(30);
+    const [left, right] = edges(lines[2], FRAME.top);
+    expect(left).toBeGreaterThanOrEqual(0);
+    expect(right).toBeLessThan(30);
   });
 });

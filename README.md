@@ -120,10 +120,11 @@ once.
 `Modal` comes in `size` `sm`/`md`/`lg`, or takes an exact `width`; either is
 narrowed to fit the terminal. `padding` spaces its content from the edge — a
 number, or `{ x, y, top, right, bottom, left }` where a side wins over its axis.
-It draws a rounded border in the theme's `borderActive` color, outside the
-width so content keeps its room, and fades the screen behind toward the app
+It draws a thin frame in the theme's `borderActive` color, using eighth-block
+lines that sit on the card's outer edge, outside the width so content keeps
+its room, and fades the screen behind toward the app
 background (skipped under transparent themes). When a popup opens over a modal,
-only the top one keeps the accent border. `border={false}` and
+only the top one keeps the accent frame. `border={false}` and
 `backdrop={false}` bring back the plain card.
 `KeyboardHelp` passes `size`, `width` and `padding` through and adds
 `sectionPadding` for the bindings list and the footer:
