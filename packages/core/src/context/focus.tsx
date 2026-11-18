@@ -84,7 +84,17 @@ export function FocusProvider(props: ParentProps<{ panes?: string[] }>) {
     return undefined;
   }
 
+  function isMounted(pane: string): boolean {
+    const target = targets().get(pane);
+    return !!target && !target.isDestroyed;
+  }
+
   function focusPane(pane: string) {
+    // The sidebar pane only mounts while the sidebar is shown; asking for it
+    // while hidden would leave focus pending on a pane that never comes.
+    if (pane === sidebarPane && pane !== contentPane && !sidebarOpen()) {
+      setSidebarOpen(true);
+    }
     setState("activePane", pane);
     // A modal keeps real focus; closing it restores focus to the active pane.
     if (isModalOpen()) return;
@@ -110,8 +120,31 @@ export function FocusProvider(props: ParentProps<{ panes?: string[] }>) {
     };
   }
 
+  // Real focus fell to nothing: its renderable was destroyed (a focused pane
+  // unmounted, or focus was pending on a pane that isn't there yet when the old
+  // one went). With nothing focused every focus-within keymap layer is dead,
+  // quit included, so put focus on a pane that is still mounted. A pending
+  // request stays pending, so that pane still takes focus once it mounts.
+  function recoverFocus() {
+    if (isModalOpen()) return;
+    const current = renderer.currentFocusedRenderable;
+    if (current && !current.isDestroyed) return;
+    const order = [
+      pendingFocus,
+      state.activePane,
+      contentPane,
+      ...panes,
+      ...targets().keys(),
+    ];
+    const pane = order.find((p): p is string => p !== null && isMounted(p));
+    if (pane) targets().get(pane)?.focus();
+  }
+
   onMount(() => {
     const onFocus = (renderable: Renderable | null) => {
+      // Wait out the update that destroyed it: a pane mounting in the same
+      // update registers (and takes pending focus) before this runs.
+      if (!renderable) queueMicrotask(recoverFocus);
       const pane = paneContaining(renderable);
       if (pane) setState("activePane", pane);
     };
@@ -127,7 +160,10 @@ export function FocusProvider(props: ParentProps<{ panes?: string[] }>) {
       (modal, prev) => {
         if (modal === "none" && prev !== undefined && prev !== "none") {
           queueMicrotask(() => {
-            if (!isModalOpen()) focusPane(state.activePane);
+            if (isModalOpen()) return;
+            focusPane(state.activePane);
+            // The active pane may have unmounted while the modal was up.
+            recoverFocus();
           });
         }
       },
@@ -135,24 +171,15 @@ export function FocusProvider(props: ParentProps<{ panes?: string[] }>) {
     ),
   );
 
-  function isMounted(pane: string): boolean {
-    const target = targets().get(pane);
-    return !!target && !target.isDestroyed;
-  }
-
   function cyclePane() {
     const idx = panes.indexOf(state.activePane);
     // Skip panes that aren't mounted (one an app only renders sometimes), or
     // focus would land nowhere until the next cycle. The sidebar pane always
-    // counts: cycling to it re-shows a hidden sidebar, which mounts afterwards.
+    // counts: focusing it re-shows a hidden sidebar, which mounts afterwards.
     // It is in every lap, so the walk always ends within one.
     for (let step = 1; step <= panes.length; step++) {
       const next = panes[(idx + step) % panes.length];
-      if (next === sidebarPane) {
-        if (!sidebarOpen()) setSidebarOpen(true);
-      } else if (!isMounted(next)) {
-        continue;
-      }
+      if (next !== sidebarPane && !isMounted(next)) continue;
       focusPane(next);
       return;
     }
