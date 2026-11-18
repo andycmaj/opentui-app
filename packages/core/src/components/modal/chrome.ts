@@ -32,19 +32,63 @@ export function modalBorderColor(modal: Theme, isTop: boolean): ThemeColor {
 // ragged against the backdrop. Eighth blocks put the line on the cell's outer
 // edge instead, so the card's surface ends exactly at the line. opentui's own
 // border takes one glyph for both horizontal sides, hence drawing it here.
-// Corners reuse the horizontal lines: the exact corner glyphs (U+1FB7C-F, from
-// Unicode 13's legacy-computing block) show as missing-glyph boxes in
-// Terminal.app and older iTerm2, while Block Elements render everywhere.
-export const FRAME = {
+export interface FrameGlyphs {
+  top: string;
+  bottom: string;
+  left: string;
+  right: string;
+  topLeft: string;
+  topRight: string;
+  bottomLeft: string;
+  bottomRight: string;
+}
+
+// The exact corners (U+1FB7C-F) are from Unicode 13's legacy-computing block.
+export const FRAME: FrameGlyphs = {
   top: "▔",
   bottom: "▁",
   left: "▏",
   right: "▕",
-  topLeft: "▔",
-  topRight: "▔",
-  bottomLeft: "▁",
-  bottomRight: "▁",
-} as const;
+  topLeft: "🭽",
+  topRight: "🭾",
+  bottomLeft: "🭼",
+  bottomRight: "🭿",
+};
+
+// Where those corners would be missing-glyph boxes (Terminal.app, older
+// iTerm2), the corners reuse the line glyphs: every glyph is then from Block
+// Elements, which render everywhere, at the cost of a notch at each corner.
+export const PLAIN_FRAME: FrameGlyphs = {
+  ...FRAME,
+  topLeft: FRAME.top,
+  topRight: FRAME.top,
+  bottomLeft: FRAME.bottom,
+  bottomRight: FRAME.bottom,
+};
+
+// Terminals that draw the legacy-computing corners themselves rather than
+// relying on the font. Kept to ones known to; anything else gets PLAIN_FRAME.
+const CORNER_TERMINALS = /ghostty|kitty|wezterm|foot|contour|rio/i;
+
+// Env vars these terminals set. Under tmux, XTVERSION names tmux rather than
+// the terminal outside it, but the outer terminal's env usually carries in.
+const CORNER_TERMINAL_ENV = [
+  "GHOSTTY_RESOURCES_DIR",
+  "KITTY_WINDOW_ID",
+  "WEZTERM_PANE",
+];
+
+// `terminalName` is opentui's XTVERSION answer, when it has one.
+export function frameGlyphs(
+  env: Record<string, string | undefined>,
+  terminalName?: string,
+): FrameGlyphs {
+  const named = [terminalName, env.TERM_PROGRAM, env.TERM].some(
+    (name) => name !== undefined && CORNER_TERMINALS.test(name),
+  );
+  const marked = CORNER_TERMINAL_ENV.some((key) => env[key]);
+  return named || marked ? FRAME : PLAIN_FRAME;
+}
 
 export interface FrameRect {
   x: number;
@@ -56,6 +100,7 @@ export interface FrameRect {
 export function drawFrame(
   buffer: OptimizedBuffer,
   rect: FrameRect,
+  glyphs: FrameGlyphs,
   color: ThemeColor,
   surface: string,
 ): void {
@@ -66,15 +111,15 @@ export function drawFrame(
   const right = x + width - 1;
   const bottom = y + height - 1;
   for (let col = x + 1; col < right; col++) {
-    buffer.setCell(col, y, FRAME.top, fg, bg);
-    buffer.setCell(col, bottom, FRAME.bottom, fg, bg);
+    buffer.setCell(col, y, glyphs.top, fg, bg);
+    buffer.setCell(col, bottom, glyphs.bottom, fg, bg);
   }
   for (let row = y + 1; row < bottom; row++) {
-    buffer.setCell(x, row, FRAME.left, fg, bg);
-    buffer.setCell(right, row, FRAME.right, fg, bg);
+    buffer.setCell(x, row, glyphs.left, fg, bg);
+    buffer.setCell(right, row, glyphs.right, fg, bg);
   }
-  buffer.setCell(x, y, FRAME.topLeft, fg, bg);
-  buffer.setCell(right, y, FRAME.topRight, fg, bg);
-  buffer.setCell(x, bottom, FRAME.bottomLeft, fg, bg);
-  buffer.setCell(right, bottom, FRAME.bottomRight, fg, bg);
+  buffer.setCell(x, y, glyphs.topLeft, fg, bg);
+  buffer.setCell(right, y, glyphs.topRight, fg, bg);
+  buffer.setCell(x, bottom, glyphs.bottomLeft, fg, bg);
+  buffer.setCell(right, bottom, glyphs.bottomRight, fg, bg);
 }

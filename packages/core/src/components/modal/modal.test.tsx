@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { Show, type JSX } from "solid-js";
 import { createSignal } from "solid-js";
 import { RGBA } from "@opentui/core";
@@ -10,13 +10,34 @@ import { KeymapProvider } from "../../keyboard/keymap-context";
 import { baseAppBindings, type KeymapTable } from "../../keyboard/keymap";
 import { Modal } from "./modal";
 import { ModalHeader } from "./modal-header";
-import { BACKDROP_ALPHA, FRAME } from "./chrome";
+import { BACKDROP_ALPHA, FRAME, PLAIN_FRAME, frameGlyphs } from "./chrome";
 
 const table: KeymapTable = { app: baseAppBindings };
 const BEHIND = "behind the modal";
 
+// The frame's corners depend on which terminal the env names, so pin it: by
+// default to none known, which draws the plain corners.
+const TERMINAL_ENV = [
+  "GHOSTTY_RESOURCES_DIR",
+  "KITTY_WINDOW_ID",
+  "WEZTERM_PANE",
+  "TERM_PROGRAM",
+  "TERM",
+];
+let savedEnv: Record<string, string | undefined> = {};
+beforeEach(() => {
+  savedEnv = Object.fromEntries(TERMINAL_ENV.map((k) => [k, process.env[k]]));
+  for (const key of TERMINAL_ENV) delete process.env[key];
+});
+
 let destroy: (() => void) | undefined;
-afterEach(() => destroy?.());
+afterEach(() => {
+  destroy?.();
+  for (const [key, value] of Object.entries(savedEnv)) {
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+});
 
 interface Rendered {
   lines: string[];
@@ -167,6 +188,20 @@ describe("Modal chrome", () => {
     expect(cell(0, 0).fg).toEqual(ints("#eeeeee"));
   });
 
+  test("a terminal known to draw the corner glyphs gets exact corners", async () => {
+    process.env.GHOSTTY_RESOURCES_DIR = "/Applications/Ghostty.app";
+    const { lines } = await render(() => (
+      <Modal size="sm" onClose={close}>
+        <text>body</text>
+      </Modal>
+    ));
+    expect(lines.join("\n")).toMatchSnapshot();
+    expect(lines[2]).toContain(FRAME.topLeft + FRAME.top);
+    expect(lines[2]).toContain(FRAME.top + FRAME.topRight);
+    expect(lines[4]).toContain(FRAME.bottomLeft + FRAME.bottom);
+    expect(lines[4]).toContain(FRAME.bottom + FRAME.bottomRight);
+  });
+
   test("narrow terminal: the bordered card still fits", async () => {
     const { lines } = await render(
       () => (
@@ -180,5 +215,25 @@ describe("Modal chrome", () => {
     const [left, right] = edges(lines[2], FRAME.top);
     expect(left).toBeGreaterThanOrEqual(0);
     expect(right).toBeLessThan(30);
+  });
+});
+
+describe("frameGlyphs", () => {
+  test("unknown terminals get corners that render everywhere", () => {
+    expect(frameGlyphs({})).toBe(PLAIN_FRAME);
+    expect(frameGlyphs({ TERM_PROGRAM: "Apple_Terminal" })).toBe(PLAIN_FRAME);
+    expect(frameGlyphs({ TERM_PROGRAM: "iTerm.app" })).toBe(PLAIN_FRAME);
+    expect(frameGlyphs({ TERM_PROGRAM: "tmux" }, "tmux")).toBe(PLAIN_FRAME);
+  });
+
+  test("the terminal's XTVERSION name or env picks exact corners", () => {
+    expect(frameGlyphs({}, "ghostty")).toBe(FRAME);
+    expect(frameGlyphs({ TERM: "xterm-kitty" })).toBe(FRAME);
+    expect(frameGlyphs({ TERM_PROGRAM: "WezTerm" })).toBe(FRAME);
+  });
+
+  test("under tmux, the outer terminal's env still counts", () => {
+    const env = { TERM_PROGRAM: "tmux", GHOSTTY_RESOURCES_DIR: "/x" };
+    expect(frameGlyphs(env, "tmux")).toBe(FRAME);
   });
 });

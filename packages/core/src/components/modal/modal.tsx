@@ -11,7 +11,7 @@ import {
   type JSX,
 } from "solid-js";
 import type { BoxRenderable, OptimizedBuffer } from "@opentui/core";
-import { useTerminalDimensions } from "@opentui/solid";
+import { useRenderer, useTerminalDimensions } from "@opentui/solid";
 import { ModalCommands } from "../../keyboard/commands";
 import type { BindingSpec } from "../../keyboard/keymap";
 import {
@@ -30,6 +30,7 @@ import {
   BORDER_CELLS,
   backdropColor,
   drawFrame,
+  frameGlyphs,
   modalBorderColor,
 } from "./chrome";
 import { pushModalLayer } from "./modal-stack";
@@ -90,6 +91,7 @@ export function Modal(props: ModalProps) {
   const themeName = useThemeName();
   const terminal = useTerminalSurface();
   const dimensions = useTerminalDimensions();
+  const renderer = useRenderer();
   const modalTheme = createMemo(() => getModalTheme(themeName(), terminal()));
   const layer = pushModalLayer();
   onCleanup(layer.release);
@@ -143,7 +145,12 @@ export function Modal(props: ModalProps) {
 
   function renderFrame(this: BoxRenderable, buffer: OptimizedBuffer): void {
     if (!bordered()) return;
-    drawFrame(buffer, this, frameColor(), modalTheme().contentPane);
+    // Read per draw: the terminal's XTVERSION answer arrives after startup.
+    const glyphs = frameGlyphs(
+      process.env,
+      renderer.capabilities?.terminal.name,
+    );
+    drawFrame(buffer, this, glyphs, frameColor(), modalTheme().contentPane);
   }
 
   // The backdrop box covers the modal's parent (the app root, in practice),

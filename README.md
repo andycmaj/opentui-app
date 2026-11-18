@@ -122,8 +122,11 @@ narrowed to fit the terminal. `padding` spaces its content from the edge — a
 number, or `{ x, y, top, right, bottom, left }` where a side wins over its axis.
 It draws a thin frame in the theme's `borderActive` color, using eighth-block
 lines that sit on the card's outer edge, outside the width so content keeps
-its room, and fades the screen behind toward the app
-background (skipped under transparent themes). When a popup opens over a modal,
+its room. Exact corner glyphs are used in terminals known to draw them
+(Ghostty, kitty, WezTerm and a few others, detected through tmux too); elsewhere
+the corners reuse the line glyphs so nothing renders as a missing glyph. It
+also fades the screen behind toward the app background (skipped under
+transparent themes). When a popup opens over a modal,
 only the top one keeps the accent frame. `border={false}` and
 `backdrop={false}` bring back the plain card.
 `KeyboardHelp` passes `size`, `width` and `padding` through and adds
