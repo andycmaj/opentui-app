@@ -1,6 +1,6 @@
 {
   "name": "@andycmaj/opentui-app",
-  "version": "0.5.9",
+  "version": "0.5.10",
   "description": "App framework + design library for @opentui/solid terminal UIs",
   "repository": {
     "type": "git",
