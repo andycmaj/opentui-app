@@ -20,7 +20,11 @@ export {
   type Padding,
   type PaddingSides,
 } from "./modal";
-export { CommandPalette, type PaletteAction } from "./command-palette";
+export {
+  CommandPalette,
+  PaletteMode,
+  type PaletteAction,
+} from "./command-palette";
 export { KeyboardHelp, type KeyboardHelpProps } from "./keyboard-help";
 export { Markdown, InlineSpans, decodeEntities, stripTags } from "./markdown";
 export * from "./log-view";
