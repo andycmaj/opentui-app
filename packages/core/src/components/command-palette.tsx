@@ -1,8 +1,12 @@
 // A generic, filterable command palette. Apps supply the actions; the palette
 // handles filtering, navigation, and running the selected action. Built on the
 // modal kit so it inherits the opaque adaptive surface and escape-to-close.
+//
+// Optional modes: once any action says whether it applies in the app's current
+// context (inContext), the palette opens on just those and a footer toggles to
+// all of them. The app owns the mode so it can reopen where the user left off.
 
-import { createMemo, For, Show } from "solid-js";
+import { createMemo, createSignal, For, Show } from "solid-js";
 import type { ScrollBoxRenderable } from "@opentui/core";
 import { TextAttributes } from "@opentui/core";
 import { useTerminalDimensions } from "@opentui/solid";
@@ -21,13 +25,26 @@ export interface PaletteAction {
   // Actions sharing a group render together under a header, groups in order
   // of first appearance. Ungrouped actions form a header-less section.
   group?: string;
+  // Whether the action applies to what the user is on. Setting it on any
+  // action (true or false) turns the palette's modes on.
+  inContext?: boolean;
   run: () => void;
 }
+
+export const PaletteMode = {
+  CONTEXT: "context",
+  ALL: "all",
+} as const;
+export type PaletteMode = (typeof PaletteMode)[keyof typeof PaletteMode];
 
 interface CommandPaletteProps {
   actions: PaletteAction[];
   title?: string;
   placeholder?: string;
+  // The mode to show, when actions carry inContext. Left out, the palette
+  // opens in context mode and keeps the mode itself.
+  mode?: PaletteMode;
+  onModeChange?: (mode: PaletteMode) => void;
   onClose: () => void;
 }
 
@@ -42,6 +59,14 @@ const LIST_ROWS = 14;
 // The header (a blank row and the title) and the filter (input between blank
 // rows) above the list.
 const ABOVE_LIST_ROWS = 5;
+// The mode footer: a blank row, then the toggle. It replaces the list's bottom
+// padding, which would otherwise scroll away from it.
+const FOOTER_ROWS = 2;
+const TOGGLE = "palette.mode.toggle";
+const MODE_LABELS: Record<PaletteMode, string> = {
+  context: "Context",
+  all: "All",
+};
 
 function matches(action: PaletteAction, q: string): boolean {
   return [action.label, action.group, action.hint].some(
@@ -54,8 +79,35 @@ export function CommandPalette(props: CommandPaletteProps) {
   const dimensions = useTerminalDimensions();
   let scrollRef: ScrollBoxRenderable | undefined;
 
+  const hasModes = createMemo(() =>
+    props.actions.some((a) => a.inContext !== undefined),
+  );
+  const [ownMode, setOwnMode] = createSignal<PaletteMode>(
+    props.mode ?? PaletteMode.CONTEXT,
+  );
+  const mode = (): PaletteMode =>
+    hasModes() ? (props.mode ?? ownMode()) : PaletteMode.ALL;
+
+  function toggleMode(): boolean | undefined {
+    // Without modes tab isn't the palette's, so let it fall through.
+    if (!hasModes()) return false;
+    const next =
+      mode() === PaletteMode.CONTEXT ? PaletteMode.ALL : PaletteMode.CONTEXT;
+    setOwnMode(next);
+    props.onModeChange?.(next);
+    nav.setSelected(0);
+    scrollRef?.scrollTo(0);
+    return undefined;
+  }
+
+  // The footer takes its rows from the list, so on a short terminal the list
+  // shrinks and the footer stays on screen.
   const listRows = createMemo(() =>
-    modalListRows(LIST_ROWS, ABOVE_LIST_ROWS, dimensions().height),
+    modalListRows(
+      LIST_ROWS,
+      ABOVE_LIST_ROWS + (hasModes() ? FOOTER_ROWS : 0),
+      dimensions().height,
+    ),
   );
 
   // Header rows (and the gap above every header but the first) shift item
@@ -79,10 +131,19 @@ export function CommandPalette(props: CommandPaletteProps) {
     },
   });
 
+  const query = (): string => nav.filter().toLowerCase();
+  const inMode = (action: PaletteAction): boolean =>
+    mode() === PaletteMode.ALL || action.inContext === true;
+  // Matches in All, for pointing at them from an empty context list.
+  const allMatches = createMemo(
+    () => props.actions.filter((a) => !query() || matches(a, query())).length,
+  );
+
   const sections = createMemo<PaletteSection[]>(() => {
-    const q = nav.filter().toLowerCase();
+    const q = query();
     const byGroup = new Map<string | undefined, PaletteAction[]>();
     for (const action of props.actions) {
+      if (!inMode(action)) continue;
       if (q && !matches(action, q)) continue;
       const list = byGroup.get(action.group);
       if (list) list.push(action);
@@ -97,6 +158,17 @@ export function CommandPalette(props: CommandPaletteProps) {
     sections().some((s) => s.group !== undefined),
   );
 
+  const emptyText = (): string => {
+    if (mode() === PaletteMode.CONTEXT) {
+      if (!query()) {
+        return `Nothing to do on this row. tab shows all ${props.actions.length}.`;
+      }
+      if (allMatches() > 0)
+        return `No match here. ${allMatches()} in All (tab).`;
+    }
+    return "No matching commands";
+  };
+
   function runSelected() {
     const action = flat()[nav.selected()];
     if (action) {
@@ -109,11 +181,16 @@ export function CommandPalette(props: CommandPaletteProps) {
     <Modal
       size="lg"
       onClose={props.onClose}
-      bindings={modalNavBindings}
+      bindings={[
+        ...modalNavBindings,
+        { key: "tab", cmd: TOGGLE, desc: "switch" },
+        { key: "shift+tab", cmd: TOGGLE, desc: "switch" },
+      ]}
       commands={{
         [ModalCommands.MODAL_DOWN]: () => nav.move(1),
         [ModalCommands.MODAL_UP]: () => nav.move(-1),
         [ModalCommands.MODAL_SELECT]: runSelected,
+        [TOGGLE]: toggleMode,
       }}
     >
       <ModalHeader title={props.title ?? "Commands"} hint="↵ run · esc" />
@@ -126,11 +203,11 @@ export function CommandPalette(props: CommandPaletteProps) {
         maxHeight={listRows()}
         paddingLeft={2}
         paddingRight={2}
-        paddingBottom={1}
+        paddingBottom={hasModes() ? 0 : 1}
       >
         <Show
           when={flat().length > 0}
-          fallback={<text fg={theme.textMuted}>No matching commands</text>}
+          fallback={<text fg={theme.textMuted}>{emptyText()}</text>}
         >
           <For each={sections()}>
             {(section, sectionIndex) => (
@@ -185,6 +262,48 @@ export function CommandPalette(props: CommandPaletteProps) {
           </For>
         </Show>
       </scrollbox>
+      <Show when={hasModes()}>
+        <ModeFooter mode={mode()} />
+      </Show>
     </Modal>
+  );
+}
+
+// A segmented chip, the active mode on the accent, then the key that switches.
+function ModeFooter(props: { mode: PaletteMode }) {
+  const theme = useTheme();
+  const segment = (m: PaletteMode) => {
+    const active = (): boolean => props.mode === m;
+    return (
+      <box flexDirection="row">
+        <text fg={theme.accent}>{active() ? "▌" : " "}</text>
+        <text
+          fg={active() ? contrastingForeground(theme.accent) : theme.textMuted}
+          bg={active() ? theme.accent : undefined}
+          attributes={active() ? TextAttributes.BOLD : 0}
+        >
+          {` ${MODE_LABELS[m]} `}
+        </text>
+        <text fg={theme.accent}>{active() ? "▐" : " "}</text>
+      </box>
+    );
+  };
+  return (
+    <box
+      flexDirection="row"
+      justifyContent="space-between"
+      paddingTop={1}
+      paddingLeft={2}
+      paddingRight={2}
+    >
+      <box flexDirection="row">
+        {segment(PaletteMode.CONTEXT)}
+        {segment(PaletteMode.ALL)}
+      </box>
+      <box flexDirection="row">
+        <text fg={theme.text}>tab</text>
+        <text fg={theme.textMuted}>{"  switch"}</text>
+      </box>
+    </box>
   );
 }

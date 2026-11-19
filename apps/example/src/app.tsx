@@ -18,6 +18,7 @@ import {
   useScope,
   useTheme,
   useToast,
+  PaletteMode,
   type PaletteAction,
   type ThemeName,
 } from "@andycmaj/opentui-app";
@@ -114,24 +115,38 @@ function AppContent(props: AppContentProps) {
     { target: () => layout },
   );
 
+  // Context mode shows what applies to the selected task; the app keeps the
+  // mode so the palette reopens where it was left.
+  const [paletteMode, setPaletteMode] = createSignal<PaletteMode>(
+    PaletteMode.CONTEXT,
+  );
   const paletteActions = createMemo<PaletteAction[]>(() => [
-    { id: "refresh", label: "Refresh data", hint: "r", run: refresh },
+    {
+      id: "refresh",
+      label: "Refresh data",
+      hint: "r",
+      inContext: false,
+      run: refresh,
+    },
     {
       id: "theme",
       label: `Cycle theme (current: ${props.themeName()})`,
       hint: "t",
+      inContext: false,
       run: doCycleTheme,
     },
     {
       id: "help",
       label: "Keyboard help",
       hint: "?",
+      inContext: false,
       run: () => openModal("help"),
     },
     ...tasks().map<PaletteAction>((task, index) => ({
       id: `task-${task.id}`,
       label: `Open: ${task.title}`,
       group: "Tasks",
+      inContext: index === selected(),
       run: () => openTask(index),
     })),
   ]);
@@ -168,7 +183,12 @@ function AppContent(props: AppContentProps) {
       <Footer />
 
       <Show when={activeModal() === "palette"}>
-        <CommandPalette actions={paletteActions()} onClose={closeModal} />
+        <CommandPalette
+          actions={paletteActions()}
+          mode={paletteMode()}
+          onModeChange={setPaletteMode}
+          onClose={closeModal}
+        />
       </Show>
       <Show when={activeModal() === "help"}>
         <KeyboardHelp
