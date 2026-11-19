@@ -56,6 +56,24 @@ export function modalWidth(preferred: number, terminalWidth: number): number {
   return Math.min(preferred, available);
 }
 
+// Rows from the top of the screen to the modal's card.
+export const MODAL_TOP = 2;
+
+// A list never shrinks below this, however short the terminal.
+const MIN_LIST_ROWS = 4;
+
+// The rows a modal's scrolling list gets: its preferred height, cut so the
+// card ends a row above the terminal's bottom edge and its frame stays whole.
+// otherRows is everything else in the card: header, filter, padding, footer.
+export function modalListRows(
+  preferred: number,
+  otherRows: number,
+  terminalHeight: number,
+): number {
+  const room = terminalHeight - MODAL_TOP - BORDER_CELLS - 1 - otherRows;
+  return Math.max(MIN_LIST_ROWS, Math.min(preferred, room));
+}
+
 export interface ModalProps {
   size?: ModalSize;
   // An exact preferred width in cells, for when no size fits; wins over size.
@@ -171,7 +189,7 @@ export function Modal(props: ModalProps) {
           ref={(r: BoxRenderable) => (box = r)}
           focusable
           position="absolute"
-          top={2}
+          top={MODAL_TOP}
           left="50%"
           marginLeft={marginLeft()}
           width={width()}
