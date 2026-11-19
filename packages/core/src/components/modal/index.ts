@@ -1,6 +1,8 @@
 export {
   Modal,
   modalWidth,
+  modalListRows,
+  MODAL_TOP,
   SIZE_CONFIG,
   type ModalProps,
   type ModalSize,

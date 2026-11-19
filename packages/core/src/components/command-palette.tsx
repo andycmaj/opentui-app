@@ -5,13 +5,14 @@
 import { createMemo, For, Show } from "solid-js";
 import type { ScrollBoxRenderable } from "@opentui/core";
 import { TextAttributes } from "@opentui/core";
+import { useTerminalDimensions } from "@opentui/solid";
 import { useTheme } from "../theme";
 import { contrastingForeground } from "../theme/color";
 import { useListNavigation } from "../hooks/use-list-navigation";
 import { truncate } from "../utils/truncate";
 import { ModalCommands } from "../keyboard/commands";
 import { modalNavBindings } from "../keyboard/keymap";
-import { Modal, ModalHeader, ModalFilterInput } from "./modal";
+import { Modal, ModalHeader, ModalFilterInput, modalListRows } from "./modal";
 
 export interface PaletteAction {
   id: string;
@@ -36,6 +37,11 @@ interface PaletteSection {
 }
 
 const HINT_MAX = 24;
+// The list's height on a tall terminal; a short one gets fewer rows.
+const LIST_ROWS = 14;
+// The header (a blank row and the title) and the filter (input between blank
+// rows) above the list.
+const ABOVE_LIST_ROWS = 5;
 
 function matches(action: PaletteAction, q: string): boolean {
   return [action.label, action.group, action.hint].some(
@@ -45,14 +51,21 @@ function matches(action: PaletteAction, q: string): boolean {
 
 export function CommandPalette(props: CommandPaletteProps) {
   const theme = useTheme();
+  const dimensions = useTerminalDimensions();
   let scrollRef: ScrollBoxRenderable | undefined;
+
+  const listRows = createMemo(() =>
+    modalListRows(LIST_ROWS, ABOVE_LIST_ROWS, dimensions().height),
+  );
 
   // Header rows (and the gap above every header but the first) shift item
   // rows, so scroll sync works in rows rather than item indexes.
   const nav = useListNavigation({
     itemCount: () => flat().length,
     scrollRef: () => scrollRef,
-    visibleItems: 12,
+    // The scrollbox's padding scrolls with its content, so every one of its
+    // rows can hold an item.
+    visibleItems: listRows,
     rowOf: (index) => {
       let row = 0;
       let seen = 0;
@@ -110,7 +123,7 @@ export function CommandPalette(props: CommandPaletteProps) {
       />
       <scrollbox
         ref={(r: ScrollBoxRenderable) => (scrollRef = r)}
-        maxHeight={14}
+        maxHeight={listRows()}
         paddingLeft={2}
         paddingRight={2}
         paddingBottom={1}

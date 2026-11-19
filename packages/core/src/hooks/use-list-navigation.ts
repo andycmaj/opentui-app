@@ -12,8 +12,9 @@ interface ListNavigationOptions {
   scrollRef: () => ScrollBoxRenderable | undefined;
   // Height of each item in rows (default 1).
   itemHeight?: number;
-  // Max visible items before scrolling (default 10).
-  visibleItems?: number;
+  // Rows the list shows before scrolling (default 10). A function is read on
+  // every move, so a list sized from the terminal follows a resize.
+  visibleItems?: number | (() => number);
   // Row an item starts at, for lists with interleaved non-item rows (group
   // headers). Defaults to index * itemHeight.
   rowOf?: (index: number) => number;
@@ -31,7 +32,10 @@ export function useListNavigation(
   options: ListNavigationOptions,
 ): ListNavigationResult {
   const itemHeight = options.itemHeight ?? 1;
-  const visibleItems = options.visibleItems ?? 10;
+  const visibleItems = (): number => {
+    const v = options.visibleItems ?? 10;
+    return typeof v === "function" ? v() : v;
+  };
 
   const [store, setStore] = createStore({
     selected: 0,
@@ -63,8 +67,8 @@ export function useListNavigation(
       // Wrapping to the first item scrolls fully up so a leading header shows.
       if (next === 0 || itemTop < scrollTop) {
         scrollRef.scrollTo(next === 0 ? 0 : itemTop);
-      } else if (itemTop >= scrollTop + visibleItems) {
-        scrollRef.scrollTo(itemTop - visibleItems + 1);
+      } else if (itemTop >= scrollTop + visibleItems()) {
+        scrollRef.scrollTo(itemTop - visibleItems() + 1);
       }
     }
   }

@@ -11,6 +11,8 @@ export {
   ModalHeader,
   ModalFilterInput,
   modalWidth,
+  modalListRows,
+  MODAL_TOP,
   resolvePadding,
   SIZE_CONFIG,
   type ModalProps,

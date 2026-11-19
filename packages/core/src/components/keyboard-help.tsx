@@ -2,9 +2,17 @@
 // groups the bindings by scope, so it stays a single source of truth with the
 // footer and palette.
 
-import { createMemo, For, Match, Switch, type JSX } from "solid-js";
-import type { ScrollBoxRenderable } from "@opentui/core";
+import {
+  createMemo,
+  createSignal,
+  For,
+  Match,
+  Switch,
+  type JSX,
+} from "solid-js";
+import type { BoxRenderable, ScrollBoxRenderable } from "@opentui/core";
 import { TextAttributes } from "@opentui/core";
+import { useTerminalDimensions } from "@opentui/solid";
 import { useTheme } from "../theme";
 import { BaseCommands, ModalCommands } from "../keyboard/commands";
 import { navBindings, type BindingSpec, type Scope } from "../keyboard/keymap";
@@ -13,6 +21,7 @@ import { getScopeBindings, mergeByCommand } from "../keyboard/keymap-utils";
 import {
   Modal,
   ModalHeader,
+  modalListRows,
   resolvePadding,
   type ModalSize,
   type Padding,
@@ -39,6 +48,11 @@ export interface KeyboardHelpProps {
 // Two cells in from the sides, a blank row under each section.
 const SECTION_PADDING: PaddingSides = { top: 0, right: 2, bottom: 1, left: 2 };
 
+// The list's height on a tall terminal; a short one gets fewer rows.
+const LIST_ROWS = 16;
+// The header: a blank row and the title.
+const HEADER_ROWS = 2;
+
 // The keys that open help also close it, alongside escape.
 const CLOSE_BINDINGS: BindingSpec[] = [
   { key: "?", cmd: ModalCommands.MODAL_CLOSE, desc: "close" },
@@ -53,7 +67,13 @@ function titleCase(scope: string): string {
 export function KeyboardHelp(props: KeyboardHelpProps) {
   const theme = useTheme();
   const table = useKeymapTable();
+  const dimensions = useTerminalDimensions();
   let scrollRef: ScrollBoxRenderable | undefined;
+  // A footer element can be any height, so its rows are measured, not counted.
+  const [footerRows, setFooterRows] = createSignal(0);
+  function measureFooter(this: BoxRenderable): void {
+    setFooterRows(this.height);
+  }
 
   const groups = createMemo(() => {
     const scopes = Object.keys(table);
@@ -75,6 +95,11 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
   const section = createMemo(() =>
     resolvePadding(props.sectionPadding, SECTION_PADDING),
   );
+  const listRows = createMemo(() => {
+    const modal = resolvePadding(props.padding);
+    const others = modal.top + modal.bottom + HEADER_ROWS + footerRows();
+    return modalListRows(LIST_ROWS, others, dimensions().height);
+  });
 
   return (
     <Modal
@@ -99,7 +124,7 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
       />
       <scrollbox
         ref={(r: ScrollBoxRenderable) => (scrollRef = r)}
-        maxHeight={16}
+        maxHeight={listRows()}
         paddingTop={section().top}
         paddingRight={section().right}
         paddingBottom={section().bottom}
@@ -129,6 +154,7 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
         <Match when={typeof props.footer === "string" && props.footer}>
           {(text) => (
             <box
+              onSizeChange={measureFooter}
               paddingTop={section().top}
               paddingRight={section().right}
               paddingBottom={section().bottom}
@@ -140,6 +166,7 @@ export function KeyboardHelp(props: KeyboardHelpProps) {
         </Match>
         <Match when={props.footer}>
           <box
+            onSizeChange={measureFooter}
             paddingTop={section().top}
             paddingRight={section().right}
             paddingBottom={section().bottom}
