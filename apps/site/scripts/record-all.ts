@@ -17,6 +17,8 @@ interface Demo {
   repo: string;
   cwd?: string;
   keys: string;
+  // Relative to cwd; most apps start at ./src/index.tsx.
+  entry?: string;
   env?: Record<string, string>;
   args?: string[];
 }
@@ -61,7 +63,7 @@ for (const demo of demos) {
   ]);
   console.log(`\n[${demo.id}] ${cwd}`);
   const result =
-    await $`bun run ${join(SITE, "scripts/record.ts")} --cwd ${cwd} --keys ${join(root, demo.keys)} --out ${join(SITE, "public/casts", `${demo.id}.cast`)} --title ${demo.id} ${env} -- bun run --conditions=browser --preload @opentui/solid/preload ./src/index.tsx ${demo.args ?? []}`.nothrow();
+    await $`bun run ${join(SITE, "scripts/record.ts")} --cwd ${cwd} --keys ${join(root, demo.keys)} --out ${join(SITE, "public/casts", `${demo.id}.cast`)} --title ${demo.id} ${env} -- bun run --conditions=browser --preload @opentui/solid/preload ${demo.entry ?? "./src/index.tsx"} ${demo.args ?? []}`.nothrow();
   if (result.exitCode !== 0) {
     warn(
       `record ${demo.id}`,

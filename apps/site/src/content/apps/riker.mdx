@@ -1,0 +1,71 @@
+---
+name: riker
+pitch: Your first officer, in a terminal. It triages GitHub and Slack, drafts your replies, and runs your crew of Claude agents.
+status: beta
+order: 4
+repo: https://github.com/andycmaj/riker
+requires:
+  - Bun, plus the `claude` CLI (Claude Code) and the `gh` CLI, both logged in
+  - tmux 3.3a or newer (3.7 for live updates), and worktrunk (`wt`) for coding tasks
+  - "Optional: a Slack user token in `SLACK_TOKEN`, or a Slack MCP for `claude`"
+configPath: ~/.riker/config.json
+keymapScopes:
+  - { id: app, title: "Anywhere" }
+  - { id: rail, title: "The rail" }
+  - { id: canvas, title: "The Canvas" }
+  - { id: input, title: "The chat box" }
+  - { id: terminal, title: "The terminal (every other key goes to it)" }
+  - { id: board, title: "The Board" }
+---
+
+import Keybindings from "../../components/Keybindings.astro";
+
+## Try it
+
+The demo is a fictional morning: the real interface on seeded GitHub and Slack
+work, with no network, no AI, and nothing sent.
+
+```sh
+git clone https://github.com/andycmaj/riker && cd riker
+bun install
+bun run demo
+```
+
+## Features
+
+- **The rail**: everything waiting on you, grouped by what it needs. Home is
+  the Assistant: ask it about any work, or tell it to make, move, start or
+  close things.
+- **Triage**: GitHub notifications and Slack messages become tasks, FYIs, or
+  wait for you. The Board's **Inbox** shows every message triage saw and what
+  it became.
+- **The Canvas**: the selected task's source, its PR's checks and reviews, what
+  the coding agent did, and the reply Riker drafted.
+- **Nothing goes out until you approve it**: `y` shows the exact words and
+  where they go; `n` or `esc` cancels.
+- **Agents**: `s` starts a Claude Code agent on a task in its own worktree and
+  tmux window. Its terminal opens inside Riker; `^]` detaches.
+- **Projects**: tasks on one repo sit under a project with a brief, goals and
+  its own tmux session.
+- **The Board** (`v`): Wins, Columns sorted by what each agent is doing,
+  Knowledge, Inbox, Cost and Docs.
+
+More in the [architecture walkthrough](https://andycmaj.github.io/riker/architecture.html)
+and the [keyboard reference](https://andycmaj.github.io/riker/keyboard.html).
+
+## Keys
+
+<Keybindings app="riker" />
+
+## Configuration
+
+State lives in `~/.riker` (`RIKER_HOME` overrides it). Settings live in
+`~/.riker/config.json`, and every key is optional:
+
+```json
+{
+  "repos": { "northwind/ledger": "/Users/me/src/ledger" },
+  "github": { "pollSeconds": 120, "mergeMethod": "squash" },
+  "slack": { "transport": "token" }
+}
+```

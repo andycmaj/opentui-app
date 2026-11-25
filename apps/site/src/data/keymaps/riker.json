@@ -1,0 +1,720 @@
+{
+  "app": [
+    {
+      "keys": "^p/:",
+      "desc": "palette"
+    },
+    {
+      "keys": "q/^c",
+      "desc": "quit"
+    },
+    {
+      "keys": "^e",
+      "desc": "sidebar"
+    },
+    {
+      "keys": "Tab",
+      "desc": "switch"
+    },
+    {
+      "keys": "?",
+      "desc": "keyboard help"
+    },
+    {
+      "keys": "v",
+      "desc": "switch Chat / Board"
+    },
+    {
+      "keys": "a",
+      "desc": "Home: ask the Assistant anything"
+    },
+    {
+      "keys": "n",
+      "desc": "next (walk the rail)"
+    },
+    {
+      "keys": "b",
+      "desc": "previous (walk the rail backwards)"
+    },
+    {
+      "keys": "/",
+      "desc": "search the rail: words, RIKER-23, #412, @someone"
+    },
+    {
+      "keys": "^\\",
+      "desc": "go to anything: search the rail from anywhere, recent rows first"
+    },
+    {
+      "keys": "[",
+      "desc": "back to where you were (history)"
+    },
+    {
+      "keys": "]",
+      "desc": "forward again (history)"
+    },
+    {
+      "keys": "^o/^[",
+      "desc": "back from anywhere: closes the dialog, leaves the box or the agent, then goes back"
+    },
+    {
+      "keys": "^a",
+      "desc": "Home: the Assistant, from anywhere"
+    },
+    {
+      "keys": "N",
+      "desc": "new task"
+    },
+    {
+      "keys": "^z",
+      "desc": "undo the last move (yours or the Assistant's)"
+    },
+    {
+      "keys": "^r",
+      "desc": "check GitHub and Slack now"
+    },
+    {
+      "keys": "D",
+      "desc": "edit PERSONA / JOB / LEARNED ..."
+    },
+    {
+      "keys": "C",
+      "desc": "connections and Advisor status"
+    }
+  ],
+  "rail": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "Enter",
+      "desc": "select it"
+    },
+    {
+      "keys": "space",
+      "desc": "fold / unfold the project's tasks"
+    },
+    {
+      "keys": "f",
+      "desc": "filter by status: the next one with tasks"
+    },
+    {
+      "keys": "0",
+      "desc": "filter: show every status"
+    },
+    {
+      "keys": "1",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "2",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "3",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "4",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "5",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "6",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "7",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "8",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "9",
+      "desc": "filter: toggle that status pill (the bar above the rail)"
+    },
+    {
+      "keys": "y",
+      "desc": "send the draft (asks first)"
+    },
+    {
+      "keys": "e",
+      "desc": "edit the draft in $EDITOR"
+    },
+    {
+      "keys": "e",
+      "desc": "edit the brief in $EDITOR (before it starts)"
+    },
+    {
+      "keys": "E",
+      "desc": "ask for a different draft"
+    },
+    {
+      "keys": "s",
+      "desc": "start / continue the agent"
+    },
+    {
+      "keys": "S",
+      "desc": "stop the agent and save"
+    },
+    {
+      "keys": "T",
+      "desc": "jump your tmux client to the agent's window"
+    },
+    {
+      "keys": "M",
+      "desc": "move it to a project"
+    },
+    {
+      "keys": "u",
+      "desc": "nudge the agent to read new reviews / CI"
+    },
+    {
+      "keys": "d",
+      "desc": "mark done"
+    },
+    {
+      "keys": "d",
+      "desc": "reopen (done or dropped; its agent does not start)"
+    },
+    {
+      "keys": "r",
+      "desc": "remind me later"
+    },
+    {
+      "keys": "w",
+      "desc": "watch it / stop watching"
+    },
+    {
+      "keys": "z",
+      "desc": "pin as one of today's Wins / unpin"
+    },
+    {
+      "keys": "x",
+      "desc": "ignore: not work, dropped (ctrl+z or d undoes)"
+    },
+    {
+      "keys": "J",
+      "desc": "story on/off: the task's state of play, kept from each finished session"
+    },
+    {
+      "keys": "J",
+      "desc": "journal on/off: the project's file of finished sessions and task events"
+    },
+    {
+      "keys": "V",
+      "desc": "read the task's story as markdown (e there rewrites it in $EDITOR)"
+    },
+    {
+      "keys": "V",
+      "desc": "read the project's journal as markdown (e there opens the file in $EDITOR)"
+    },
+    {
+      "keys": "x",
+      "desc": "archive the project"
+    },
+    {
+      "keys": "y",
+      "desc": "System: accept (take the shipped doc, write the drafts, or start the interview)"
+    },
+    {
+      "keys": "x",
+      "desc": "System: reject (keep your doc, or skip)"
+    },
+    {
+      "keys": "e",
+      "desc": "System: read the diff in revdiff (notes you leave redraft it)"
+    },
+    {
+      "keys": "e",
+      "desc": "edit the project's brief, goals, repos and docs in $EDITOR"
+    },
+    {
+      "keys": "p",
+      "desc": "cycle priority"
+    },
+    {
+      "keys": "t",
+      "desc": "change what kind of work it is"
+    },
+    {
+      "keys": "W",
+      "desc": "hand it to a person (waiting on them)"
+    },
+    {
+      "keys": "o",
+      "desc": "open the link, a URL on the task, or a file the agent made"
+    },
+    {
+      "keys": "O",
+      "desc": "edit a file the agent made in $EDITOR"
+    },
+    {
+      "keys": "P",
+      "desc": "its PR in ghdash, on the Canvas (again to close)"
+    },
+    {
+      "keys": "I",
+      "desc": "everything Riker knows about it"
+    },
+    {
+      "keys": "i",
+      "desc": "type to the agent"
+    },
+    {
+      "keys": ".",
+      "desc": "actions: summarize the work, ... (pick one)"
+    }
+  ],
+  "canvas": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "pageup",
+      "desc": "pgup"
+    },
+    {
+      "keys": "pagedown",
+      "desc": "pgdn"
+    },
+    {
+      "keys": "escape",
+      "desc": "back to the rail"
+    },
+    {
+      "keys": "y",
+      "desc": "send the draft (asks first)"
+    },
+    {
+      "keys": "e",
+      "desc": "edit the draft in $EDITOR"
+    },
+    {
+      "keys": "e",
+      "desc": "edit the brief in $EDITOR (before it starts)"
+    },
+    {
+      "keys": "E",
+      "desc": "ask for a different draft"
+    },
+    {
+      "keys": "s",
+      "desc": "start / continue the agent"
+    },
+    {
+      "keys": "S",
+      "desc": "stop the agent and save"
+    },
+    {
+      "keys": "T",
+      "desc": "jump your tmux client to the agent's window"
+    },
+    {
+      "keys": "M",
+      "desc": "move it to a project"
+    },
+    {
+      "keys": "u",
+      "desc": "nudge the agent to read new reviews / CI"
+    },
+    {
+      "keys": "d",
+      "desc": "mark done"
+    },
+    {
+      "keys": "d",
+      "desc": "reopen (done or dropped; its agent does not start)"
+    },
+    {
+      "keys": "r",
+      "desc": "remind me later"
+    },
+    {
+      "keys": "w",
+      "desc": "watch it / stop watching"
+    },
+    {
+      "keys": "z",
+      "desc": "pin as one of today's Wins / unpin"
+    },
+    {
+      "keys": "x",
+      "desc": "ignore: not work, dropped (ctrl+z or d undoes)"
+    },
+    {
+      "keys": "J",
+      "desc": "story on/off: the task's state of play, kept from each finished session"
+    },
+    {
+      "keys": "J",
+      "desc": "journal on/off: the project's file of finished sessions and task events"
+    },
+    {
+      "keys": "V",
+      "desc": "read the task's story as markdown (e there rewrites it in $EDITOR)"
+    },
+    {
+      "keys": "V",
+      "desc": "read the project's journal as markdown (e there opens the file in $EDITOR)"
+    },
+    {
+      "keys": "x",
+      "desc": "archive the project"
+    },
+    {
+      "keys": "y",
+      "desc": "System: accept (take the shipped doc, write the drafts, or start the interview)"
+    },
+    {
+      "keys": "x",
+      "desc": "System: reject (keep your doc, or skip)"
+    },
+    {
+      "keys": "e",
+      "desc": "System: read the diff in revdiff (notes you leave redraft it)"
+    },
+    {
+      "keys": "e",
+      "desc": "edit the project's brief, goals, repos and docs in $EDITOR"
+    },
+    {
+      "keys": "p",
+      "desc": "cycle priority"
+    },
+    {
+      "keys": "t",
+      "desc": "change what kind of work it is"
+    },
+    {
+      "keys": "W",
+      "desc": "hand it to a person (waiting on them)"
+    },
+    {
+      "keys": "o",
+      "desc": "open the link, a URL on the task, or a file the agent made"
+    },
+    {
+      "keys": "O",
+      "desc": "edit a file the agent made in $EDITOR"
+    },
+    {
+      "keys": "P",
+      "desc": "its PR in ghdash, on the Canvas (again to close)"
+    },
+    {
+      "keys": "I",
+      "desc": "everything Riker knows about it"
+    },
+    {
+      "keys": "i",
+      "desc": "type to the agent"
+    },
+    {
+      "keys": ".",
+      "desc": "actions: summarize the work, ... (pick one)"
+    }
+  ],
+  "input": [
+    {
+      "keys": "Enter",
+      "desc": "send (or take the @ suggestion)"
+    },
+    {
+      "keys": "Tab",
+      "desc": "@: take the suggestion"
+    },
+    {
+      "keys": "up",
+      "desc": "@: previous suggestion"
+    },
+    {
+      "keys": "down",
+      "desc": "@: next suggestion"
+    },
+    {
+      "keys": "^g",
+      "desc": "write it in $EDITOR (save and quit sends)"
+    },
+    {
+      "keys": "escape",
+      "desc": "leave the box"
+    }
+  ],
+  "toast": [
+    {
+      "keys": "escape",
+      "desc": "dismiss the error (the newest, one at a time)"
+    }
+  ],
+  "terminal": [
+    {
+      "keys": "^]",
+      "desc": "detach from the terminal"
+    },
+    {
+      "keys": "^\\",
+      "desc": "detach and go to anything"
+    },
+    {
+      "keys": "^t",
+      "desc": "detach and jump your tmux client to the agent's window (prefix L comes back)"
+    },
+    {
+      "keys": "^o",
+      "desc": "detach and go back"
+    },
+    {
+      "keys": "^[",
+      "desc": "detach and go back"
+    },
+    {
+      "keys": "^a",
+      "desc": "detach and go to the Assistant"
+    },
+    {
+      "keys": "^e",
+      "desc": "show / hide the rail (you stay attached)"
+    }
+  ],
+  "board": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "h/left",
+      "desc": "column left"
+    },
+    {
+      "keys": "l/right",
+      "desc": "column right"
+    },
+    {
+      "keys": "1",
+      "desc": "tab: wins"
+    },
+    {
+      "keys": "2",
+      "desc": "tab: columns"
+    },
+    {
+      "keys": "3",
+      "desc": "tab: knowledge"
+    },
+    {
+      "keys": "4",
+      "desc": "tab: inbox"
+    },
+    {
+      "keys": "5",
+      "desc": "tab: cost"
+    },
+    {
+      "keys": "6",
+      "desc": "tab: docs"
+    },
+    {
+      "keys": "Enter",
+      "desc": "open the task in Chat, or jump to the project's session"
+    },
+    {
+      "keys": "Enter",
+      "desc": "Wins: show or hide what happened to it that day"
+    },
+    {
+      "keys": "t",
+      "desc": "Wins: go to the task"
+    },
+    {
+      "keys": "h/left",
+      "desc": "Wins: a day earlier"
+    },
+    {
+      "keys": "l/right",
+      "desc": "Wins: a day later (never past today)"
+    },
+    {
+      "keys": "0",
+      "desc": "Wins: back to today"
+    },
+    {
+      "keys": "Enter",
+      "desc": "Docs: show or hide the address, who attached it and where"
+    },
+    {
+      "keys": "o",
+      "desc": "Docs: open it (a web link in the browser, a file in $EDITOR)"
+    },
+    {
+      "keys": "t",
+      "desc": "Docs: go to the task or project it belongs to"
+    },
+    {
+      "keys": "y",
+      "desc": "Docs: copy the address"
+    },
+    {
+      "keys": "L",
+      "desc": "Docs: attach it to another task"
+    },
+    {
+      "keys": "x",
+      "desc": "Docs: take it off where it was attached (asks first; nothing outside Riker changes)"
+    },
+    {
+      "keys": "f",
+      "desc": "Docs: next kind (PR, issue, doc, thread, file, other)"
+    },
+    {
+      "keys": "p",
+      "desc": "Docs: next project"
+    },
+    {
+      "keys": "P",
+      "desc": "Docs: group by project, or one list"
+    },
+    {
+      "keys": "/",
+      "desc": "Docs: search title, address, kind, task and project"
+    },
+    {
+      "keys": "Enter",
+      "desc": "Inbox: show or hide how triage routed it"
+    },
+    {
+      "keys": "f",
+      "desc": "Inbox: next filter"
+    },
+    {
+      "keys": "/",
+      "desc": "Inbox: search subject, sender and source"
+    },
+    {
+      "keys": "t",
+      "desc": "Inbox: go to the task it made or joined (an open idea: the task it is about)"
+    },
+    {
+      "keys": "m",
+      "desc": "Inbox: make it a task (an idea: approve it)"
+    },
+    {
+      "keys": "x",
+      "desc": "Inbox: dismiss the Advisor idea"
+    },
+    {
+      "keys": "x",
+      "desc": "Inbox: dismiss it (marked read, it leaves actionable; its task stays)"
+    },
+    {
+      "keys": "X",
+      "desc": "Inbox: ignore (drops the task it made; ctrl+z undoes)"
+    },
+    {
+      "keys": "o",
+      "desc": "Inbox: open the message's link"
+    },
+    {
+      "keys": "F",
+      "desc": "Inbox: create noise filter (triage files its like as FYI)"
+    },
+    {
+      "keys": "U",
+      "desc": "Inbox: re-run triage on it"
+    },
+    {
+      "keys": "B",
+      "desc": "Inbox: show the whole message, or cap it again"
+    },
+    {
+      "keys": "c",
+      "desc": "write a knowledge entry"
+    },
+    {
+      "keys": "A",
+      "desc": "adopt a tmux session or a stray claude as a project"
+    },
+    {
+      "keys": "s",
+      "desc": "start / continue the agent"
+    },
+    {
+      "keys": "S",
+      "desc": "stop the agent and save"
+    },
+    {
+      "keys": "T",
+      "desc": "jump your tmux client to the agent's or project's window"
+    },
+    {
+      "keys": "u",
+      "desc": "nudge the agent about new feedback"
+    },
+    {
+      "keys": "d",
+      "desc": "mark done"
+    },
+    {
+      "keys": "d",
+      "desc": "reopen (done or dropped; its agent does not start)"
+    },
+    {
+      "keys": ".",
+      "desc": "actions: summarize the work, ... (pick one)"
+    },
+    {
+      "keys": "M",
+      "desc": "move the task to a project"
+    },
+    {
+      "keys": "P",
+      "desc": "its PR in ghdash (in Chat)"
+    },
+    {
+      "keys": "R",
+      "desc": "repos: where each is checked out, and checkouts to add"
+    }
+  ]
+}
