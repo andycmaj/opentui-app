@@ -38,6 +38,27 @@ the build plan.
   workflows, nightly cron.
 - **No analytics.** No theme-override env var in the framework.
 
+## Status (2026-11-25)
+
+All eight phases are built; nothing is deployed yet. How to deploy, and the
+setup only the owner can do (enable Pages, `SITE_DISPATCH_TOKEN` secrets), is
+in [`apps/site/README.md`](../../apps/site/README.md).
+
+Settled in the 2026-11-25 grilling, changing Phase 8:
+
+- CI records demos and extracts keymaps from each app's **latest release**
+  (not its default branch), so the site shows what `mise use` installs.
+- A demo that fails in CI is a warning; the committed cast/keymap JSON stays.
+  Casts and keymap JSON therefore stay committed as the fallback.
+- Recording needs no tmux/asciinema install (Bun PTY, see Phase 5), so CI
+  installs only Bun.
+- App release workflows send `app-released` with a `SITE_DISPATCH_TOKEN`
+  secret, skipped while unset. This repo's `release.yml` starts `site.yml`
+  itself (`workflow_dispatch`), since its `GITHUB_TOKEN` push can't.
+
+The apps' fixture modes and key scripts are on `site-demo` branches in each
+app repo (`<repo>.site-demo` worktrees), not yet merged or released.
+
 ## Phase 1 — Site skeleton + theme tokens
 
 1. Scaffold `apps/site` (Astro, `@astrojs/solid-js`, `@astrojs/mdx`). Add to
