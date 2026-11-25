@@ -1,0 +1,136 @@
+{
+  "app": [
+    {
+      "keys": "^p/:",
+      "desc": "palette"
+    },
+    {
+      "keys": "q/^c",
+      "desc": "quit"
+    },
+    {
+      "keys": "^e",
+      "desc": "sidebar"
+    },
+    {
+      "keys": "Tab",
+      "desc": "switch"
+    },
+    {
+      "keys": "?",
+      "desc": "keyboard help"
+    },
+    {
+      "keys": "space",
+      "desc": "resource picker"
+    },
+    {
+      "keys": "w",
+      "desc": "watcher info"
+    },
+    {
+      "keys": "i",
+      "desc": "resource info"
+    }
+  ],
+  "tree": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "Enter",
+      "desc": "select"
+    },
+    {
+      "keys": "e",
+      "desc": "expand all groups"
+    },
+    {
+      "keys": "c",
+      "desc": "collapse all groups"
+    },
+    {
+      "keys": "d",
+      "desc": "toggle disabled"
+    },
+    {
+      "keys": "f",
+      "desc": "status filter"
+    },
+    {
+      "keys": "escape",
+      "desc": "reset status filter"
+    },
+    {
+      "keys": "r",
+      "desc": "trigger reload"
+    },
+    {
+      "keys": "^d",
+      "desc": "toggle disable"
+    }
+  ],
+  "resource": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "pageup",
+      "desc": "pgup"
+    },
+    {
+      "keys": "pagedown",
+      "desc": "pgdn"
+    },
+    {
+      "keys": "s",
+      "desc": "autoscroll logs"
+    },
+    {
+      "keys": "t",
+      "desc": "toggle timestamps"
+    },
+    {
+      "keys": "/",
+      "desc": "search logs"
+    },
+    {
+      "keys": "escape",
+      "desc": "clear search"
+    },
+    {
+      "keys": "r",
+      "desc": "trigger reload"
+    },
+    {
+      "keys": "^d",
+      "desc": "toggle disable"
+    }
+  ]
+}

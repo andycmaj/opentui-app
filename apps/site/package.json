@@ -1,0 +1,34 @@
+{
+  "name": "@opentui-app/site",
+  "version": "0.1.0",
+  "description": "opentui-apps \u2014 website for @andycmaj/opentui-app and the apps built on it",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "tokens": "bun run scripts/gen-tokens.ts",
+    "dev": "bun run tokens && bun run api && bun --bun astro dev",
+    "build": "bun run tokens && bun run api && bun --bun astro build && pagefind --site dist",
+    "preview": "bun --bun astro preview",
+    "typecheck": "bun run tokens && bun run api && bun --bun astro check",
+    "api": "bun run scripts/gen-api.ts",
+    "record": "bun run scripts/record-all.ts",
+    "keymaps": "bun run scripts/extract-keymaps.ts"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.1.1",
+    "@astrojs/solid-js": "^7.1.1",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "asciinema-player": "3.17.0",
+    "astro": "^7.4.2",
+    "marked": "^17.0.1",
+    "solid-js": "1.9.12"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "pagefind": "^1.6.0",
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.14.1",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,118 @@
+---
+import { SITE_THEMES } from "../themes";
+
+interface Props {
+  current?: "apps" | "framework" | "changelog";
+}
+const { current } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const nav = [
+  { id: "apps", label: "apps", href: `${base}/#apps` },
+  { id: "framework", label: "framework", href: `${base}/framework/` },
+  { id: "changelog", label: "changelog", href: `${base}/changelog/` },
+] as const;
+---
+
+<header class="site-header">
+  <a class="brand" href={`${base}/`} aria-label="opentui-apps home">
+    <span class="bar" aria-hidden="true"></span>opentui-apps
+  </a>
+  <nav aria-label="Main">
+    {
+      nav.map((item) => (
+        <a
+          href={item.href}
+          class:list={{ active: item.id === current }}
+          aria-current={item.id === current ? "page" : undefined}
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="tools">
+    <button type="button" data-open-search aria-label="Search (/)">
+      <span class="key">/</span> search
+    </button>
+    <button type="button" data-cycle-theme aria-label="Cycle theme (t)">
+      theme <span class="theme-name" data-theme-name>{SITE_THEMES[0]}</span>
+    </button>
+  </div>
+</header>
+
+<script>
+  // Mouse and touch entry points for what the keyboard does with `/` and `t`.
+  import { Overlay, openOverlay } from "../lib/overlay";
+  import { cycleTheme, syncThemeLabels } from "../lib/site-theme";
+
+  syncThemeLabels();
+  document.querySelector("[data-open-search]")?.addEventListener("click", () => {
+    openOverlay(Overlay.SEARCH);
+  });
+  document.querySelector("[data-cycle-theme]")?.addEventListener("click", () => {
+    cycleTheme();
+  });
+</script>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--row) * 0.25) calc(var(--cell) * 3);
+    padding: calc(var(--row) * 0.75) calc(var(--cell) * 2);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 1ch;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+  .brand:hover {
+    text-decoration: none;
+  }
+  .bar {
+    display: inline-block;
+    width: var(--bar);
+    height: 1.2em;
+    background: var(--secondary);
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 calc(var(--cell) * 2);
+  }
+  nav a {
+    color: var(--muted);
+  }
+  nav a.active,
+  nav a:hover {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .tools {
+    margin-left: auto;
+    display: flex;
+    gap: calc(var(--cell) * 2);
+  }
+  .tools button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+  }
+  .tools button:hover {
+    color: var(--text);
+  }
+  .key {
+    color: var(--primary);
+  }
+  .theme-name {
+    color: var(--accent);
+  }
+</style>

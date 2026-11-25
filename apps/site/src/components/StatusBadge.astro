@@ -1,0 +1,12 @@
+---
+// Glyph + label, like core's StatusIndicator: state survives the mono theme
+// because it never relies on color alone. Styled in global.css so the hero
+// island can draw the same badge.
+interface Props {
+  status: "stable" | "beta";
+}
+const { status } = Astro.props;
+const glyph = status === "stable" ? "●" : "◐";
+---
+
+<span class:list={["badge", `badge--${status}`]}>{glyph} {status}</span>

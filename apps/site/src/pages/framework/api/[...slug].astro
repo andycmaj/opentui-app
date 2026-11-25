@@ -1,0 +1,21 @@
+---
+import { getCollection, render } from "astro:content";
+import Docs from "../../../layouts/Docs.astro";
+import { apiPath } from "../../../lib/site-pages";
+
+export async function getStaticPaths() {
+  const api = await getCollection("api");
+  return api.map((entry) => ({
+    params: { slug: entry.id === "index" ? undefined : entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const name = entry.id === "index" ? "API reference" : (entry.id.split("/").pop() ?? entry.id);
+---
+
+<Docs title={name} description={`${name} — @andycmaj/opentui-app API`} path={apiPath(entry.id)}>
+  <Content />
+</Docs>

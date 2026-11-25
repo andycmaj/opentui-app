@@ -1,0 +1,91 @@
+---
+// An app's keybindings, generated from its own keymap table
+// (scripts/extract-keymaps.ts) and laid out like its `?` help screen: a title
+// per scope in --accent, keys in --primary, descriptions in --muted.
+import { getEntry } from "astro:content";
+
+interface Props {
+  app: string;
+}
+const { app } = Astro.props;
+
+interface Row {
+  keys: string;
+  desc: string;
+}
+const tables = import.meta.glob<{ default: Record<string, Row[]> }>("../data/keymaps/*.json", {
+  eager: true,
+});
+const table = tables[`../data/keymaps/${app}.json`]?.default;
+const entry = await getEntry("apps", app);
+const scopes = entry?.data.keymapScopes ?? [];
+const sections = table
+  ? scopes
+      .map((s) => ({ title: s.title, rows: table[s.id] ?? [] }))
+      .filter((s) => s.rows.length > 0)
+  : [];
+---
+
+{
+  sections.length > 0 && (
+    <div class="keybindings">
+      {sections.map((section) => (
+        <section>
+          <h3 class="scope">{section.title}</h3>
+          <dl>
+            {section.rows.map((row) => (
+              <>
+                <dt>
+                  <kbd>{row.keys}</kbd>
+                </dt>
+                <dd>{row.desc}</dd>
+              </>
+            ))}
+          </dl>
+        </section>
+      ))}
+      <p class="note muted">Generated from the app's keymap.</p>
+    </div>
+  )
+}
+
+<style>
+  .keybindings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 32ch), 1fr));
+    gap: var(--row) calc(var(--cell) * 4);
+    margin: var(--row) 0;
+    padding: var(--row) calc(var(--cell) * 2);
+    background: var(--pane);
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    line-height: var(--row);
+  }
+  .scope {
+    margin: 0 0 calc(var(--row) * 0.25);
+    font-size: inherit;
+    color: var(--accent);
+  }
+  .scope::before {
+    content: none;
+  }
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0 2ch;
+    margin: 0;
+  }
+  dd {
+    margin: 0;
+    color: var(--muted);
+  }
+  kbd {
+    font-size: inherit;
+    color: var(--primary);
+  }
+  .note {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 0.85rem;
+  }
+</style>

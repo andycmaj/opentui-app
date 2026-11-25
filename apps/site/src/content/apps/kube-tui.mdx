@@ -1,0 +1,39 @@
+---
+name: kube-tui
+pitch: A k9s- and Lens-style Kubernetes browser, with shells and editors in the pane.
+status: beta
+order: 3
+repo: https://github.com/andycmaj/kube-tui
+requires:
+  - "`kubectl` on your `PATH` with a working kubeconfig"
+keymapScopes:
+  - { id: app, title: "Global" }
+  - { id: tree, title: "Resources" }
+  - { id: content, title: "Content" }
+---
+
+import Keybindings from "../../components/Keybindings.astro";
+
+## Features
+
+- **Resource tree**: built-in kinds grouped like Lens, plus custom resources
+  discovered from CRDs. Expanding a kind starts a live watch.
+- **Content pane**: `describe` (the default), YAML, logs, or kubectl's own
+  table for a whole kind.
+- **Shell (`s`) and edit (`e`)** run inside the content pane on an embedded
+  terminal (Bun PTY and libghostty-vt). Every key goes to the program except
+  `ctrl+]`, which returns to the tree; `tab` goes back in.
+- **Operations**: delete (`ctrl+d`), rollout restart (`shift+r`) and scale
+  (`shift+s`), each confirmed in a dialog.
+- `:` jumps to any kind, k9s-style, and `n` switches namespace.
+
+## Keys
+
+<Keybindings app="kube-tui" />
+
+## Usage
+
+```sh
+kube-tui                          # current context, all namespaces
+kube-tui --context my-ctx -n default
+```

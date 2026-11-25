@@ -1,0 +1,39 @@
+{
+  "$comment": "Recorded demos. `repo` is checked out next to this repo (or passed with --path id=dir); `keys` is relative to that checkout. Recorded by scripts/record-all.ts. `keymap` (apps only) is the module exporting `keymap`, read by scripts/extract-keymaps.ts.",
+  "demos": [
+    {
+      "id": "tilt-tui",
+      "repo": "andycmaj/tilt-tui",
+      "keys": "demo/demo.keys",
+      "env": {
+        "TILT_TUI_FIXTURE": "default"
+      },
+      "keymap": "src/keymap.ts"
+    },
+    {
+      "id": "ghdash",
+      "repo": "andycmaj/ghdash",
+      "keys": "demo/demo.keys",
+      "env": {
+        "GHDASH_FIXTURE": "default"
+      },
+      "keymap": "src/keymap.ts"
+    },
+    {
+      "id": "kube-tui",
+      "repo": "andycmaj/kube-tui",
+      "keys": "demo/demo.keys",
+      "env": {
+        "KUBE_TUI_FIXTURE": "default"
+      },
+      "keymap": "src/keymap.ts"
+    },
+    {
+      "id": "keymaps",
+      "repo": "andycmaj/opentui-app",
+      "cwd": "apps/example",
+      "keys": "apps/example/demo/keymaps.keys",
+      "args": ["keymaps"]
+    }
+  ]
+}

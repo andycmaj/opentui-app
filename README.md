@@ -11,7 +11,8 @@ commands, and screens); the framework provides everything else.
 
 ```
 packages/core     @andycmaj/opentui-app — the framework + design library
-apps/example       a minimal two-pane demo consuming the library
+apps/example       demos consuming the library (basic two-pane, keymaps)
+apps/site          "opentui-apps", the website for the framework and its apps
 ```
 
 ## What the library gives you
@@ -176,6 +177,10 @@ bun run format          # oxfmt
 The demo exercises every primitive: two panes, cursor nav (`j`/`k`/`g`/`G`),
 `Tab` pane cycling, `l` in the detail pane for a streaming `LogBufferView`, `Ctrl-E` sidebar toggle, `:` command palette, `?` help, `r`
 refresh toast, and `t` to cycle all four themes.
+
+`bun run dev:example keymaps` runs the keymaps example: two pane scopes plus
+the app scope, with a dispatch log showing which scope handled each key. The
+site's keymaps guide walks through it.
 
 ## Consuming from another repo
 

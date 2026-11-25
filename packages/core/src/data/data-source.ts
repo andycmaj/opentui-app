@@ -82,8 +82,10 @@ export function errorMessage(err: unknown): string {
  * `"<label> failed: <message>"` as an error toast. Optionally refreshes after
  * either outcome. Returns whether the mutation succeeded.
  *
- *   const guard = makeGuard(showToast, refresh);
- *   await guard("Accept change", () => actions.accept(entry));
+ * ```ts
+ * const guard = makeGuard(showToast, refresh);
+ * await guard("Accept change", () => actions.accept(entry));
+ * ```
  */
 export function makeGuard(
   showToast: (

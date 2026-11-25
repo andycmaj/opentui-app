@@ -1,0 +1,32 @@
+---
+import Base from "../layouts/Base.astro";
+import Pane from "../components/Pane.astro";
+import PaneHeader from "../components/PaneHeader.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<Base title="Not found" description="No page here." noindex>
+  <Pane focused aria-label="Not found">
+    <PaneHeader title="404" level={1}>
+      <span class="badge badge--beta">◐ not found</span>
+    </PaneHeader>
+    <p class="msg"><span class="err">✗</span> no pane at this path</p>
+    <p class="muted">
+      Try <kbd>/</kbd> to search, <kbd>ctrl+k</kbd> for the palette, or go
+      back to <a href={`${base}/`}>apps</a> or the <a href={`${base}/framework/`}>framework docs</a>.
+    </p>
+  </Pane>
+</Base>
+
+<style>
+  .msg {
+    margin: 0;
+  }
+  .err {
+    color: var(--error);
+  }
+  kbd {
+    color: var(--primary);
+  }
+</style>

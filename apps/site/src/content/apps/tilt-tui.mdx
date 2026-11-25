@@ -1,0 +1,58 @@
+---
+name: tilt-tui
+pitch: A terminal UI for Tilt, with vim-like navigation.
+status: stable
+order: 1
+repo: https://github.com/andycmaj/tilt-tui
+requires:
+  - A running `tilt` process
+configPath: ~/.config/tilt-tui/config.json
+keymapScopes:
+  - { id: app, title: "Global" }
+  - { id: tree, title: "Tree View" }
+  - { id: resource, title: "Log View" }
+---
+
+import Keybindings from "../../components/Keybindings.astro";
+
+## Features
+
+- **Resource tree** of everything Tilt manages, grouped like the Tilt web UI,
+  with live status dots.
+- **Status filter** (`f`) cycles failed / in progress / successful / all, and
+  the **resource picker** (`space`) jumps to any resource by name.
+- **Log view** for the selected resource: search with `/`, toggle timestamps
+  with `t`, autoscroll with `s`.
+- **Actions** from the keyboard: trigger a reload (`r`), enable or disable a
+  resource (`ctrl+d`), inspect a resource (`i`) or the Tilt engine (`w`).
+- **Self-updating**: notices new releases and offers to install them.
+
+## Keys
+
+<Keybindings app="tilt-tui" />
+
+## Configuration
+
+Settings live in `~/.config/tilt-tui/config.json` and are read at startup.
+
+### Log filters
+
+Hide noisy log lines with named groups of regex patterns. Active filters are
+listed in the log view header.
+
+```json
+{
+  "logFilters": {
+    "health-checks": ["GET /health", "GET /readiness"],
+    "debug-logs": ["^DEBUG:", "\\[debug\\]"]
+  }
+}
+```
+
+### Theme
+
+```json
+{ "theme": "terminal" }
+```
+
+One of `default`, `tokyo-night`, `terminal`, or `mono`.

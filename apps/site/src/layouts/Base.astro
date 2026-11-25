@@ -1,0 +1,96 @@
+---
+import "../styles/global.css";
+import "../styles/overlay.css";
+import "../styles/code.css";
+import { getCollection } from "astro:content";
+import { sitePages } from "../lib/site-pages";
+import ThemeScript from "../components/ThemeScript.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteKeys from "../islands/site-keys";
+
+interface Props {
+  title?: string;
+  description?: string;
+  section?: "apps" | "framework" | "changelog";
+  // Kept out of search engines and the site's own search (the 404 page).
+  noindex?: boolean;
+}
+const {
+  title,
+  description = "Terminal apps built on @andycmaj/opentui-app, and the framework itself.",
+  section,
+  noindex = false,
+} = Astro.props;
+const fullTitle = title ? `${title} · opentui-apps` : "opentui-apps";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(`${base}/og.png`, Astro.site);
+const pages = sitePages(base, {
+  apps: (await getCollection("apps")).sort((a, b) => a.data.order - b.data.order),
+  docs: (await getCollection("docs")).sort((a, b) => a.data.order - b.data.order),
+  api: await getCollection("api"),
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="opentui-apps" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <ThemeScript />
+  </head>
+  <body>
+    <div class="shell">
+      <SiteHeader current={section} />
+      <div class:list={["frame", { "has-sidebar": Astro.slots.has("sidebar") }]}>
+        {Astro.slots.has("sidebar") && <slot name="sidebar" />}
+        <main id="main" data-pagefind-body={noindex ? undefined : ""}>
+          <slot />
+        </main>
+      </div>
+      <SiteFooter />
+    </div>
+    <SiteKeys client:load base={base} pages={pages} />
+  </body>
+</html>
+
+<style>
+  .shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+  /* One-cell window-frame margin, like core's framed Pane. */
+  .frame {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--row) var(--cell);
+    padding: var(--row) var(--cell);
+  }
+  .frame.has-sidebar {
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  }
+  main {
+    min-width: 0;
+  }
+  @media (max-width: 720px) {
+    .frame.has-sidebar {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

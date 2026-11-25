@@ -1,0 +1,195 @@
+---
+title: Quick Start
+description: Install the framework and build a two-pane app.
+order: 1
+---
+
+## Install
+
+Add the framework and its peers. The `@opentui/*` packages and `solid-js`
+must resolve to a single copy shared with the framework, which installing
+from the registry gives you.
+
+```sh
+bun add @andycmaj/opentui-app @opentui/core @opentui/solid solid-js
+```
+
+Your `tsconfig.json` needs Solid's JSX settings for OpenTUI:
+
+```json
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "@opentui/solid",
+    "moduleResolution": "bundler",
+    "customConditions": ["browser"],
+    "strict": true
+  }
+}
+```
+
+Run the app with the Solid transform preloaded:
+
+```sh
+bun run --conditions=browser --preload @opentui/solid/preload ./src/index.tsx
+```
+
+Don't add that preload globally in `bunfig.toml`: it would run for every
+script, including ones that never touch Solid.
+
+## Boot
+
+`runApp` renders your root with an error boundary and installs the process
+handlers that restore the terminal on exit.
+
+```tsx
+// src/index.tsx
+import { runApp } from "@andycmaj/opentui-app";
+import { App } from "./app";
+
+await runApp(() => <App />);
+```
+
+## Commands
+
+Commands are plain string ids. Start from the framework's base commands
+(quit, palette, focus cycling, list navigation) and add your own.
+
+```ts
+// src/commands.ts
+import { BaseCommands } from "@andycmaj/opentui-app";
+
+export const Commands = {
+  ...BaseCommands,
+  ITEM_OPEN: "item.open",
+  REFRESH: "data.refresh",
+} as const;
+```
+
+## Keymap
+
+One table, keyed by scope. `app` applies anywhere; each pane's scope applies
+while focus is inside that pane. `help` marks a binding for the footer.
+
+```ts
+// src/keymap.ts
+import {
+  baseAppBindings,
+  navBindings,
+  type KeymapTable,
+} from "@andycmaj/opentui-app";
+import { Commands } from "./commands";
+
+export const PANES = ["list", "detail"];
+
+export const keymap: KeymapTable = {
+  app: [
+    ...baseAppBindings,
+    { key: "r", cmd: Commands.REFRESH, desc: "refresh", help: "refresh" },
+  ],
+  list: [
+    ...navBindings(),
+    { key: "return", cmd: Commands.ITEM_OPEN, desc: "open", help: "open" },
+  ],
+  detail: navBindings(),
+};
+```
+
+## Providers
+
+The provider stack is always the same: theme, focus, toasts, keymap. Your
+shell goes inside, with `<Toast />` last so it draws on top.
+
+```tsx
+// src/app.tsx
+import {
+  FocusProvider,
+  KeymapProvider,
+  ThemeProvider,
+  Toast,
+  ToastProvider,
+} from "@andycmaj/opentui-app";
+import { keymap, PANES } from "./keymap";
+
+export function App() {
+  return (
+    <ThemeProvider name="default">
+      <FocusProvider panes={PANES}>
+        <ToastProvider>
+          <KeymapProvider keymap={keymap}>
+            <Shell />
+            <Toast />
+          </KeymapProvider>
+        </ToastProvider>
+      </FocusProvider>
+    </ThemeProvider>
+  );
+}
+```
+
+## Panes and handlers
+
+Give each pane a name with `<Pane name>` and register its handlers with
+`useScope`. Handlers only run while focus is inside that pane.
+
+```tsx
+import { BaseCommands, Footer, Pane, useScope } from "@andycmaj/opentui-app";
+import type { Renderable } from "@opentui/core";
+
+function List() {
+  let pane: Renderable | undefined;
+  useScope(
+    "list",
+    {
+      [BaseCommands.NAV_DOWN]: () => cursor.move(1),
+      [BaseCommands.NAV_UP]: () => cursor.move(-1),
+    },
+    { target: () => pane },
+  );
+  return (
+    <Pane name="list" variant="sidebar" ref={(r) => (pane = r)}>
+      …
+    </Pane>
+  );
+}
+
+function Shell() {
+  return (
+    <box flexDirection="column" flexGrow={1}>
+      <box flexDirection="row" flexGrow={1}>
+        <List />
+        <Detail />
+      </box>
+      <Footer />
+    </box>
+  );
+}
+```
+
+## Data
+
+Implement `DataSource<T>` however you like. `createAsyncState` gives you the
+reactive loading / error / data store, and `makeGuard` turns a failed mutation
+into an error toast and a refresh.
+
+```ts
+import { createAsyncState, type DataSource } from "@andycmaj/opentui-app";
+
+export function createTaskSource(): DataSource<Task[]> {
+  const store = createAsyncState<Task[]>([]);
+  return {
+    state: store.state,
+    async refresh() {
+      store.setLoading(true);
+      try {
+        store.setData(await fetchTasks());
+      } catch (e) {
+        store.setError(String(e));
+      }
+    },
+  };
+}
+```
+
+`apps/example` in the repository is a complete version of this app, with a
+streaming log view, the palette, the help screen and theme cycling.

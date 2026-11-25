@@ -1,0 +1,49 @@
+---
+// Mirrors core's <Card>: a --pane surface whose heavy left bar is always
+// reserved (so nothing shifts) and lights up in the accent when selected,
+// hovered, or keyboard-focused.
+interface Props {
+  href?: string;
+  selected?: boolean;
+  accent?: string;
+  class?: string;
+}
+const { href, selected = false, accent, class: className } = Astro.props;
+const Tag = href ? "a" : "div";
+---
+
+<Tag
+  href={href}
+  data-nav-item={href ? "" : undefined}
+  class:list={["card", { "is-selected": selected }, className]}
+  style={accent ? `--card-accent: ${accent}` : undefined}
+>
+  {Astro.slots.has("header") && <div class="card-header"><slot name="header" /></div>}
+  <slot />
+</Tag>
+
+<style>
+  .card {
+    display: block;
+    padding: var(--row) calc(var(--cell) * 2);
+    background: var(--pane);
+    border-left: var(--bar) solid var(--pane);
+    color: var(--text);
+  }
+  a.card:hover {
+    text-decoration: none;
+  }
+  .card.is-selected,
+  a.card:hover,
+  a.card:focus-visible {
+    border-left-color: var(--card-accent, var(--primary));
+    outline: none;
+  }
+  .card-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 calc(var(--cell) * 2);
+    margin-bottom: calc(var(--row) * 0.5);
+  }
+</style>

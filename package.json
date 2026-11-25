@@ -9,13 +9,15 @@
     "apps/*"
   ],
   "scripts": {
-    "typecheck": "tsc -p packages/core/tsconfig.json && tsc -p apps/example/tsconfig.json",
+    "typecheck": "tsc -p packages/core/tsconfig.json && tsc -p apps/example/tsconfig.json && bun run --cwd apps/site typecheck",
     "test": "bun test",
     "dev:example": "bun run --cwd apps/example dev",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "dev:site": "bun run --cwd apps/site dev",
+    "build:site": "bun run --cwd apps/site build"
   },
   "devDependencies": {
     "@types/bun": "latest",

@@ -1,0 +1,41 @@
+---
+// Mirrors core's <Footer> hint row: keys in --primary, labels in --muted,
+// joined by " · ".
+export interface Hint {
+  keys: string;
+  text: string;
+}
+interface Props {
+  hints: Hint[];
+}
+const { hints } = Astro.props;
+---
+
+<span class="hints">
+  {
+    hints.map((hint, i) => (
+      <span class="hint">
+        {i > 0 && <span class="sep"> · </span>}
+        <kbd>{hint.keys}</kbd>
+        <span class="text"> {hint.text}</span>
+      </span>
+    ))
+  }
+</span>
+
+<style>
+  .hints {
+    white-space: pre-wrap;
+  }
+  .hint {
+    white-space: pre;
+  }
+  kbd {
+    font-size: inherit;
+    color: var(--primary);
+  }
+  .text,
+  .sep {
+    color: var(--muted);
+  }
+</style>

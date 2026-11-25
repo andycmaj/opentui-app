@@ -1,0 +1,84 @@
+name: Site
+run-name: "site (${{ github.event_name }}${{ github.event.client_payload.app && format(' {0} {1}', github.event.client_payload.app, github.event.client_payload.version) || '' }})"
+
+# Builds "panes" (apps/site) and deploys it to GitHub Pages. Demo recordings
+# and keybinding tables are regenerated from each app's latest release; an app
+# that fails keeps the cast/keymap committed in apps/site (a warning, not a
+# failed deploy).
+on:
+  push:
+    branches: [main]
+  # Sent by each app's release workflow (and by this repo's release.yml via
+  # workflow_dispatch, since GITHUB_TOKEN pushes don't trigger workflows).
+  repository_dispatch:
+    types: [app-released]
+  # Picks up releases whose dispatch didn't arrive, and refreshes the changelog.
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; never cancel one halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Apps are cloned next to this repo, where the site scripts look for
+      # them, so this repo gets its own directory.
+      - uses: actions/checkout@v5
+        with:
+          path: opentui-app
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install
+        working-directory: opentui-app
+        run: bun install --frozen-lockfile
+
+      - name: Check out apps at their latest release
+        working-directory: opentui-app/apps/site
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bun run scripts/checkout-apps.ts
+
+      - name: Record demos
+        working-directory: opentui-app/apps/site
+        run: bun run record --warn-only
+
+      - name: Extract keybindings
+        working-directory: opentui-app/apps/site
+        run: bun run keymaps --warn-only
+
+      - name: Build
+        working-directory: opentui-app/apps/site
+        env:
+          # The changelog reads this repo's releases at build time.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bun run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: opentui-app/apps/site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

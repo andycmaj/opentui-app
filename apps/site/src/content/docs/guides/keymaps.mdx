@@ -1,0 +1,134 @@
+---
+title: Keymaps
+description: One binding table keyed by scope drives dispatch, the footer, the palette, and the help screen.
+order: 2
+---
+
+import { Code } from "astro:components";
+import keymapSource from "../../../../../example/src/examples/keymaps/keymap.ts?raw";
+import commandsSource from "../../../../../example/src/examples/keymaps/commands.ts?raw";
+import Recording from "../../../islands/recording";
+import { castUrl } from "../../../lib/casts";
+
+Every key an app understands is declared once, in a table keyed by **scope**.
+The framework reads that table to dispatch keys, to fill the footer, to list
+commands in the palette, and to build the `?` help screen. A binding is
+described in exactly one place.
+
+This guide follows the keymaps example in the repository. Run it with:
+
+```sh
+bun run dev:example keymaps
+```
+
+It has two panes, a list of colors and a dispatch log. Every key you press
+shows up in the log, together with the scope that handled it.
+
+<Recording client:visible src={castUrl("keymaps")} posterAt={9} />
+
+## Commands
+
+A command is a string id. Start from `BaseCommands` (quit, palette, help,
+focus cycling, list navigation) and add your own:
+
+<Code code={commandsSource} lang="ts" theme="css-variables" />
+
+## The table
+
+`app` applies anywhere in the pane layout. Each pane gets a scope of the same
+name, which applies only while focus is inside that pane. `baseAppBindings`
+and `navBindings()` give every app the same core keys.
+
+<Code code={keymapSource} lang="ts" theme="css-variables" />
+
+Each binding has:
+
+| Field      | Meaning                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------- |
+| `key`      | `@opentui/keymap` syntax: `"j"`, `"return"`, `"ctrl+p"`, `"shift+g"`. Upper case does not imply shift.        |
+| `cmd`      | The command it runs.                                                                                          |
+| `desc`     | The description in the help screen and palette.                                                               |
+| `help`     | Optional. When set, the binding appears in the footer with this label.                                        |
+| `relevant` | Optional. The binding is listed in the footer and help only while this returns true. It never blocks the key. |
+
+## Which scope wins
+
+A key reaches exactly one handler: the innermost focused scope that binds
+it, otherwise the `app` scope.
+
+In the example, both `app` and `colors` bind `s`. With the colors pane
+focused, `s` sorts the colors. Press `tab` to focus the dispatch log, which
+binds only navigation, and the same `s` falls through to `app` and saves. The
+dispatch log shows it:
+
+```text
+colors   s       colors.sort
+app      tab     focus.next
+app      s       app.save
+```
+
+## Registering handlers
+
+Bindings in the table do nothing until a component provides handlers for
+their commands with `useScope`. Pass the pane's renderable as `target` and
+the handlers apply only while focus is inside it:
+
+```tsx
+let pane: Renderable | undefined;
+useScope(
+  "colors",
+  {
+    [Commands.NAV_DOWN]: () => cursor.move(1),
+    [Commands.NAV_UP]: () => cursor.move(-1),
+    [Commands.COLOR_PICK]: togglePick,
+    [Commands.COLOR_SORT]: () => setSorted((s) => !s),
+  },
+  { target: () => pane },
+);
+
+return (
+  <Pane name="colors" variant="sidebar" ref={(r) => (pane = r)}>
+    …
+  </Pane>
+);
+```
+
+Only bindings whose command has a handler are registered, so a scope never
+swallows a key it can't act on. A handler that returns exactly `false`
+declines the key, which then falls through to lower layers or to the focused
+element, such as a text input.
+
+The `app` scope is registered the same way, targeting the box around the
+whole pane layout.
+
+## Footer and help
+
+`<Footer />` lists the bindings reachable from the focused pane that have a
+`help` label. `<KeyboardHelp />` lists every binding, grouped by scope:
+
+```tsx
+<KeyboardHelp
+  onClose={closeModal}
+  scopeLabels={{ app: "Anywhere", colors: "Colors pane", log: "Dispatch log" }}
+  scopeOrder={["app", "colors", "log"]}
+/>
+```
+
+In the example, `x` (clear the log) has no `help` label, so it appears in the
+help screen but not in the footer.
+
+## Modals
+
+`Modal`, and everything built on it (the command palette, the help screen),
+takes focus into its own high-priority layer. While a modal is open, pane and
+app keys can't fire, and typing in its filter input never triggers them.
+Closing it returns focus to the pane you were in.
+
+Lists inside modals use `modalNavBindings`, which are all non-printing keys
+(arrows, `ctrl+j`/`ctrl+k`, `return`), so every typed character still reaches
+the filter.
+
+## The full example
+
+[`apps/example/src/examples/keymaps`](https://github.com/andycmaj/opentui-app/tree/main/apps/example/src/examples/keymaps)
+has the panes, the dispatch log, and the app shell.

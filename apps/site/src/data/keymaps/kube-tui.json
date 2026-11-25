@@ -1,0 +1,182 @@
+{
+  "app": [
+    {
+      "keys": "^p/:",
+      "desc": "palette"
+    },
+    {
+      "keys": "q/^c",
+      "desc": "quit"
+    },
+    {
+      "keys": "^e",
+      "desc": "sidebar"
+    },
+    {
+      "keys": "Tab",
+      "desc": "switch"
+    },
+    {
+      "keys": "?",
+      "desc": "keyboard help"
+    },
+    {
+      "keys": "n",
+      "desc": "namespace"
+    },
+    {
+      "keys": "space",
+      "desc": "quick search"
+    }
+  ],
+  "tree": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "Enter",
+      "desc": "expand / open"
+    },
+    {
+      "keys": "right",
+      "desc": "expand"
+    },
+    {
+      "keys": "left",
+      "desc": "collapse"
+    },
+    {
+      "keys": "c",
+      "desc": "collapse all"
+    },
+    {
+      "keys": "x",
+      "desc": "close terminal session"
+    },
+    {
+      "keys": "d",
+      "desc": "describe"
+    },
+    {
+      "keys": "y",
+      "desc": "yaml"
+    },
+    {
+      "keys": "l",
+      "desc": "logs"
+    },
+    {
+      "keys": "s",
+      "desc": "shell"
+    },
+    {
+      "keys": "e",
+      "desc": "edit"
+    },
+    {
+      "keys": "^d",
+      "desc": "delete"
+    },
+    {
+      "keys": "R",
+      "desc": "rollout restart"
+    },
+    {
+      "keys": "S",
+      "desc": "scale"
+    }
+  ],
+  "content": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "pageup",
+      "desc": "pgup"
+    },
+    {
+      "keys": "pagedown",
+      "desc": "pgdn"
+    },
+    {
+      "keys": "d",
+      "desc": "describe"
+    },
+    {
+      "keys": "y",
+      "desc": "yaml"
+    },
+    {
+      "keys": "l",
+      "desc": "logs"
+    },
+    {
+      "keys": "s",
+      "desc": "shell"
+    },
+    {
+      "keys": "e",
+      "desc": "edit"
+    },
+    {
+      "keys": "^d",
+      "desc": "delete"
+    },
+    {
+      "keys": "R",
+      "desc": "rollout restart"
+    },
+    {
+      "keys": "S",
+      "desc": "scale"
+    },
+    {
+      "keys": "f",
+      "desc": "follow"
+    },
+    {
+      "keys": "/",
+      "desc": "find"
+    },
+    {
+      "keys": "escape",
+      "desc": "clear find"
+    },
+    {
+      "keys": "c",
+      "desc": "log container"
+    }
+  ],
+  "terminal": [
+    {
+      "keys": "^]",
+      "desc": "detach"
+    }
+  ]
+}

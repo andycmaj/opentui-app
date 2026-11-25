@@ -1,0 +1,45 @@
+---
+title: "@andycmaj/opentui-app"
+description: An app framework and design library for @opentui/solid terminal UIs.
+navLabel: overview
+order: 0
+---
+
+An app framework and design library for
+[`@opentui/solid`](https://github.com/sst/opentui) terminal UIs. It was
+extracted from three production TUIs (tilt-tui, dotsync, and ghdash) that had
+independently grown the same skeleton.
+
+A new app supplies only its domain: a data source, its commands, and its
+screens. The framework provides everything else, and every app built on it
+looks and behaves the same way: the same panes and focus bar, the same footer,
+palette, help screen and themes. This site borrows that look too.
+
+## What you get
+
+| Area           | Exports                                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **Boot**       | `runApp` (render, error boundary, process handlers), `emergencyExit`                                                                |
+| **Keyboard**   | `BaseCommands`, `baseAppBindings`, `navBindings`, `modalNavBindings`, `useScope`, `useKeyPassthrough`, `KeymapProvider`             |
+| **Theme**      | `ThemeProvider`, `useTheme`, four terminal-adaptive themes, `getModalTheme`, color math, `focusBorder`                              |
+| **Context**    | `FocusProvider` and `usePane` (real-focus panes, sidebar, modal), `ToastProvider`, `createRequiredContext`                          |
+| **Data**       | `DataSource<T>`, `createAsyncState`, `makeGuard` (bring your own fetching)                                                          |
+| **Components** | `Modal`, `CommandPalette`, `KeyboardHelp`, `StatusIndicator`, `Footer`, `Pane`, `PaneHeader`, `Card`, `Toast`, `Marker`, `Markdown` |
+| **Log view**   | `LogBufferView` (virtual scrolling, wrapping, ANSI, search, select-to-copy), `LogSource`, `createMemoryLogSource`                   |
+| **Hooks**      | `useListNavigation` (filterable), `useListCursor`                                                                                   |
+| **Utils**      | `openUrl`, `copyToClipboard` (including WSL), `createConfigStore`, `truncate`, `parseAnsi`, `stripAnsi`, `displayWidth`             |
+
+## Ideas it is built on
+
+- **One keymap table.** Bindings are declared once, keyed by scope. The
+  footer, the command palette and the help screen are all derived from it, so
+  a key is described in exactly one place.
+- **Real focus.** Panes are OpenTUI focus targets. A key goes to the innermost
+  focused scope, then the app scope. A modal takes focus into its own layer, so
+  nothing behind it can fire.
+- **An unopinionated data seam.** `DataSource<T>` standardizes the
+  loading / error / data shape, not how you fetch.
+- **Themes that respect the terminal.** `terminal` and `mono` defer to the
+  terminal's own colors instead of painting over them.
+
+Start with the [Quick Start](./quick-start/).
