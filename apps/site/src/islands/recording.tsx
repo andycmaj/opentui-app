@@ -28,7 +28,7 @@ export default function Recording(props: RecordingProps): JSX.Element {
     // Unmounted while the player module loaded (the hero switched app).
     if (disposed) return;
     player = create(props.src, container, {
-      theme: "panes",
+      theme: "opentui-apps",
       fit: "width",
       autoPlay: props.still ? false : (props.autoPlay ?? false),
       loop: props.still ? false : (props.loop ?? true),

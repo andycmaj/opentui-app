@@ -12,7 +12,7 @@ commands, and screens); the framework provides everything else.
 ```
 packages/core     @andycmaj/opentui-app — the framework + design library
 apps/example       demos consuming the library (basic two-pane, keymaps)
-apps/site          "panes", the website for the framework and its apps
+apps/site          "opentui-apps", the website for the framework and its apps
 ```
 
 ## What the library gives you

@@ -22,7 +22,7 @@ const {
   section,
   noindex = false,
 } = Astro.props;
-const fullTitle = title ? `${title} · panes` : "panes";
+const fullTitle = title ? `${title} · opentui-apps` : "opentui-apps";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(`${base}/og.png`, Astro.site);
@@ -42,7 +42,7 @@ const pages = sitePages(base, {
     <title>{fullTitle}</title>
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="panes" />
+    <meta property="og:site_name" content="opentui-apps" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />

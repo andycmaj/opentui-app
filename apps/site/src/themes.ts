@@ -6,4 +6,4 @@ export const SITE_THEMES = [
   "tokyo-night",
 ] as const;
 export type SiteTheme = (typeof SITE_THEMES)[number];
-export const THEME_STORAGE_KEY = "panes:theme";
+export const THEME_STORAGE_KEY = "opentui-appsheme";

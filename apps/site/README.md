@@ -1,4 +1,4 @@
-# panes — the website
+# opentui-apps — the website
 
 Astro site for `@andycmaj/opentui-app` and the apps built on it, served from
 GitHub Pages at <https://andycmaj.github.io/opentui-app/>. The build plan and

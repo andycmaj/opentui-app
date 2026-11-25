@@ -181,7 +181,7 @@ const ansi = [
   "#ffffff",
 ];
 const playerTheme = [
-  ".asciinema-player-theme-panes {",
+  ".asciinema-player-theme-opentui-apps {",
   `  --term-color-foreground: ${d.text};`,
   `  --term-color-background: ${d.background};`,
   ...ansi.map((c, i) => `  --term-color-${i}: ${c};`),

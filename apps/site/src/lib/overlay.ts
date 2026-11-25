@@ -8,7 +8,7 @@ export const Overlay = {
 } as const;
 export type Overlay = (typeof Overlay)[keyof typeof Overlay];
 
-const OPEN_EVENT = "panes:open";
+const OPEN_EVENT = "opentui-apps:open";
 
 export function openOverlay(overlay: Overlay): void {
   document.dispatchEvent(

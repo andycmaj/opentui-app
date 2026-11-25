@@ -1,4 +1,4 @@
-# Plan: "panes" website
+# Plan: "opentui-apps" website
 
 Home for the TUI apps built on `@andycmaj/opentui-app`, with the framework as
 one of them. Decisions settled in the 2026-10-23 grilling session; this file is
@@ -6,7 +6,7 @@ the build plan.
 
 ## Settled decisions
 
-- **Name / URL:** "panes", GitHub Pages default URL (`andycmaj.github.io/opentui-app`).
+- **Name / URL:** "opentui-apps" (renamed from "panes" on 2026-11-25), GitHub Pages default URL (`andycmaj.github.io/opentui-app`).
 - **Code:** `apps/site` in this monorepo. Astro, custom layout (no Starlight
   theme), small Solid islands.
 - **Apps at launch:** `tilt-tui`, `ghdash` (repo and binary name; the roster called it ghdash-tui), `kube-tui` (beta). `dotsync`
@@ -73,7 +73,7 @@ app repo (`<repo>.site-demo` worktrees), not yet merged or released.
    edge, focus ring = `--border-active`), `PaneHeader`, `StatusBadge`,
    `KeyHint`, `Footer`. Fonts: self-hosted mono (e.g. JetBrains Mono) +
    proportional body.
-4. Base layout: header pane (logo "panes", nav: Apps / Framework / Changelog,
+4. Base layout: header pane (logo "opentui-apps", nav: Apps / Framework / Changelog,
    theme indicator), main content, keybind footer.
 
 Verify: `bun run build:site` succeeds; every theme renders header/footer/panes
