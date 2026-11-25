@@ -166,8 +166,21 @@
   margin: 0 0 calc(var(--row) * 0.5);
   pointer-events: none;
 }
-.recording--still .ap-overlay-start {
+/* Outranks the player's own `.ap-player .ap-overlay`, which loads later. */
+.recording--still .ap-player .ap-overlay-start {
   display: none;
+}
+
+/* Home hero: half the page, centered, so the gallery shows above the fold.
+   Narrow screens keep the full width; half of a phone is unreadable. */
+.pane.hero {
+  width: 50%;
+  margin-inline: auto;
+}
+@media (max-width: 1100px) {
+  .pane.hero {
+    width: 100%;
+  }
 }
 
 /* Home hero: the reel's title bar reads like a PaneHeader. */
