@@ -160,3 +160,60 @@
 .recording .ap-player {
   border-radius: 0;
 }
+
+/* Thumbnails in the home gallery: a still frame, inert inside its card link. */
+.recording--still {
+  margin: 0 0 calc(var(--row) * 0.5);
+  pointer-events: none;
+}
+.recording--still .ap-overlay-start {
+  display: none;
+}
+
+/* Home hero: the reel's title bar reads like a PaneHeader. */
+.reel-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 calc(var(--cell) * 2);
+}
+.reel-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: var(--row);
+}
+.reel-title::before {
+  content: none;
+}
+.reel-title a {
+  color: var(--primary);
+}
+.reel-nav {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--cell);
+  margin-left: auto;
+}
+.reel-nav button {
+  padding: 0 var(--cell);
+  border: 0;
+  background: var(--pane);
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
+.reel-nav button:hover,
+.reel-nav button:focus-visible {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+  outline: none;
+}
+.reel-hint kbd {
+  color: var(--primary);
+  font-size: inherit;
+}
+@media (max-width: 720px) {
+  .reel-hint {
+    display: none;
+  }
+}

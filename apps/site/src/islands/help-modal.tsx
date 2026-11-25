@@ -17,6 +17,10 @@ const GROUPS: { title: string; items: { keys: string; desc: string }[] }[] = [
     ],
   },
   {
+    title: "Home",
+    items: [{ keys: "← / →", desc: "switch app demo" }],
+  },
+  {
     title: "Palette & search",
     items: [
       { keys: "↑ / ↓", desc: "move selection (also ctrl+k / ctrl+j)" },

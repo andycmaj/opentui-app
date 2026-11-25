@@ -185,3 +185,14 @@ h4 {
   border-bottom: 1px solid var(--border-subtle);
   vertical-align: top;
 }
+
+.badge {
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+.badge--stable {
+  color: var(--success);
+}
+.badge--beta {
+  color: var(--warning);
+}

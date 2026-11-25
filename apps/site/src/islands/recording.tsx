@@ -11,28 +11,46 @@ interface RecordingProps {
   posterAt?: number;
   autoPlay?: boolean;
   loop?: boolean;
+  // A still frame for a thumbnail: no controls, no pointer or keyboard focus,
+  // so it never competes with the link it sits in.
+  still?: boolean;
+  onEnded?: () => void;
 }
 
 export default function Recording(props: RecordingProps): JSX.Element {
   let container: HTMLDivElement | undefined;
   let player: Player | undefined;
+  let disposed = false;
 
   onMount(async () => {
     if (!container || !props.src) return;
     const { create } = await import("asciinema-player");
+    // Unmounted while the player module loaded (the hero switched app).
+    if (disposed) return;
     player = create(props.src, container, {
       theme: "panes",
       fit: "width",
-      autoPlay: props.autoPlay ?? false,
-      loop: props.loop ?? true,
+      autoPlay: props.still ? false : (props.autoPlay ?? false),
+      loop: props.still ? false : (props.loop ?? true),
       idleTimeLimit: 1.5,
       poster: `npt:${props.posterAt ?? 3}`,
       terminalFontFamily: '"JetBrains Mono", ui-monospace, Menlo, monospace',
-      controls: "auto",
+      controls: props.still ? false : "auto",
     });
+    const onEnded = props.onEnded;
+    if (onEnded) player.addEventListener("ended", () => onEnded());
   });
 
-  onCleanup(() => player?.dispose());
+  onCleanup(() => {
+    disposed = true;
+    player?.dispose();
+  });
 
-  return <div class="recording" ref={container} />;
+  return (
+    <div
+      class={props.still ? "recording recording--still" : "recording"}
+      ref={container}
+      aria-hidden={props.still ? "true" : undefined}
+    />
+  );
 }

@@ -2,23 +2,31 @@
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
 import Pane from "../components/Pane.astro";
-import PaneHeader from "../components/PaneHeader.astro";
 import Card from "../components/Card.astro";
 import StatusBadge from "../components/StatusBadge.astro";
-import KeyHints from "../components/KeyHints.astro";
+import HeroReel, { type ReelItem } from "../islands/hero-reel";
+import Recording from "../islands/recording";
+import { castUrl } from "../lib/casts";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const apps = (await getCollection("apps")).sort((a, b) => a.data.order - b.data.order);
-const first = apps[0]?.data.name ?? "";
+const reel: ReelItem[] = apps.flatMap((app) => {
+  const cast = castUrl(app.id);
+  return cast
+    ? [{ id: app.id, name: app.data.name, href: `${base}/apps/${app.id}/`, status: app.data.status, cast }]
+    : [];
+});
+const frameworkCast = castUrl("keymaps");
 ---
 
 <Base section="apps">
-  <Pane focused class="hero" aria-label="Demo">
-    <PaneHeader title={first} level={1}>
-      <KeyHints hints={[{ keys: "←/→", text: "switch app" }]} />
-    </PaneHeader>
-    <div class="screen">recording goes here</div>
-  </Pane>
+  {
+    reel.length > 0 && (
+      <Pane focused class="hero" aria-label="App demos">
+        <HeroReel client:load items={reel} />
+      </Pane>
+    )
+  }
 
   <section id="apps" class="gallery" aria-label="Apps" data-nav-list>
     <Card href={`${base}/framework/`} selected accent="var(--secondary)">
@@ -26,31 +34,28 @@ const first = apps[0]?.data.name ?? "";
         <strong class="name">@andycmaj/opentui-app</strong>
         <span class="muted">framework</span>
       </Fragment>
+      {frameworkCast && <Recording client:visible src={frameworkCast} still posterAt={6} />}
       <p>The engine all of these are built on.</p>
     </Card>
     {
-      apps.map((app) => (
-        <Card href={`${base}/apps/${app.id}/`}>
-          <Fragment slot="header">
-            <strong class="name">{app.data.name}</strong>
-            <StatusBadge status={app.data.status} />
-          </Fragment>
-          <p>{app.data.pitch}</p>
-        </Card>
-      ))
+      apps.map((app) => {
+        const cast = castUrl(app.id);
+        return (
+          <Card href={`${base}/apps/${app.id}/`}>
+            <Fragment slot="header">
+              <strong class="name">{app.data.name}</strong>
+              <StatusBadge status={app.data.status} />
+            </Fragment>
+            {cast && <Recording client:visible src={cast} still posterAt={6} />}
+            <p>{app.data.pitch}</p>
+          </Card>
+        );
+      })
     }
   </section>
 </Base>
 
 <style>
-  .screen {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 120 / 36;
-    max-width: 100%;
-    background: var(--pane);
-    color: var(--muted);
-  }
   .gallery {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 34ch), 1fr));
