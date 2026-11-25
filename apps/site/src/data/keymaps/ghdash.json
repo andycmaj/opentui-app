@@ -133,6 +133,84 @@
       "desc": "pgdn"
     }
   ],
+  "tivo": [
+    {
+      "keys": "j/down",
+      "desc": "down"
+    },
+    {
+      "keys": "k/up",
+      "desc": "up"
+    },
+    {
+      "keys": "g",
+      "desc": "top"
+    },
+    {
+      "keys": "G",
+      "desc": "bottom"
+    },
+    {
+      "keys": "Enter",
+      "desc": "open file in the player"
+    },
+    {
+      "keys": "h/left",
+      "desc": "previous commit"
+    },
+    {
+      "keys": "l/right",
+      "desc": "next commit"
+    },
+    {
+      "keys": "[",
+      "desc": "previous change in this commit"
+    },
+    {
+      "keys": "]",
+      "desc": "next change in this commit"
+    },
+    {
+      "keys": "<",
+      "desc": "previous changed file"
+    },
+    {
+      "keys": ">",
+      "desc": "next changed file"
+    },
+    {
+      "keys": "0",
+      "desc": "jump to merge-base"
+    },
+    {
+      "keys": "$",
+      "desc": "jump to HEAD"
+    },
+    {
+      "keys": "b",
+      "desc": "toggle blame gutter"
+    },
+    {
+      "keys": "escape",
+      "desc": "back to file list"
+    },
+    {
+      "keys": "^d",
+      "desc": "half page down"
+    },
+    {
+      "keys": "^u",
+      "desc": "half page up"
+    },
+    {
+      "keys": "pageup",
+      "desc": "pgup"
+    },
+    {
+      "keys": "pagedown",
+      "desc": "pgdn"
+    }
+  ],
   "terminal": [
     {
       "keys": "^]",

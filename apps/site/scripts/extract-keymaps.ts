@@ -3,11 +3,12 @@
 // joined ("j/down"), formatted by core's own help helpers so the site's
 // tables read exactly like the apps' `?` screens.
 //
-//   bun run scripts/extract-keymaps.ts [--path id=dir] [--only id]
+//   bun run scripts/extract-keymaps.ts [--path id=dir] [--only id] [--warn-only]
 
 import { parseArgs } from "node:util";
 import { join, resolve } from "node:path";
 import { $ } from "bun";
+import { warn } from "./warn";
 import {
   getScopeBindings,
   mergeByCommand,
@@ -30,6 +31,8 @@ const { values } = parseArgs({
   options: {
     path: { type: "string", multiple: true, default: [] },
     only: { type: "string", multiple: true, default: [] },
+    // CI: a demo that fails keeps its committed keymap JSON and the run goes on.
+    "warn-only": { type: "boolean", default: false },
   },
 });
 const overrides = new Map<string, string>();
@@ -82,8 +85,14 @@ for (const demo of demos) {
       `[${demo.id}] ${Object.keys(extracted).length} scopes, ${rows} rows -> ${out}`,
     );
   } catch (err) {
-    console.error(`[${demo.id}] failed:`, err);
+    warn(
+      `keymaps ${demo.id}`,
+      `extraction failed; kept the committed JSON: ${String(err)}`,
+    );
     failed++;
   }
 }
-if (failed > 0) process.exit(1);
+if (failed > 0) {
+  warn("keymaps", `${failed} demo(s) failed; their committed keymap JSON kept`);
+  if (!values["warn-only"]) process.exit(1);
+}

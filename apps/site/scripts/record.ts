@@ -135,14 +135,27 @@ async function main(): Promise<void> {
     },
   });
 
+  // An app that dies mid-script (crash, missing fixture) would leave a cast of
+  // its error screen; fail instead so the committed cast stays in place.
+  let exitedEarly = false;
+  void proc.exited.then(() => {
+    exitedEarly = true;
+  });
+
   await sleep(Number(values.startup));
   for (const step of steps) {
+    if (exitedEarly) break;
     if (step.kind === "wait") {
       await sleep(step.ms);
       continue;
     }
     proc.terminal?.write(step.data);
     await sleep(pause);
+  }
+  if (exitedEarly) {
+    throw new Error(
+      `app exited (code ${proc.exitCode}) before the key script finished; ${values.out} left unchanged`,
+    );
   }
   // Stop the clock before killing: the app's exit restores the shell screen,
   // which shouldn't end up as the cast's last frame.

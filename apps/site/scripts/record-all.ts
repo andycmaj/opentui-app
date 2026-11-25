@@ -3,12 +3,14 @@
 //   bun run scripts/record-all.ts                       # sibling checkouts
 //   bun run scripts/record-all.ts --path tilt-tui=../../../tilt-tui-root
 //   bun run scripts/record-all.ts --only kube-tui
+//   bun run scripts/record-all.ts --warn-only            # CI: failures warn
 //
 // Each app runs from source with the Solid preload, against its fixture mode.
 
 import { parseArgs } from "node:util";
 import { join, resolve } from "node:path";
 import { $ } from "bun";
+import { warn } from "./warn";
 
 interface Demo {
   id: string;
@@ -26,6 +28,8 @@ const { values } = parseArgs({
   options: {
     path: { type: "string", multiple: true, default: [] },
     only: { type: "string", multiple: true, default: [] },
+    // CI: a demo that fails keeps its committed cast and the run goes on.
+    "warn-only": { type: "boolean", default: false },
   },
 });
 const overrides = new Map<string, string>();
@@ -59,8 +63,14 @@ for (const demo of demos) {
   const result =
     await $`bun run ${join(SITE, "scripts/record.ts")} --cwd ${cwd} --keys ${join(root, demo.keys)} --out ${join(SITE, "public/casts", `${demo.id}.cast`)} --title ${demo.id} ${env} -- bun run --conditions=browser --preload @opentui/solid/preload ./src/index.tsx ${demo.args ?? []}`.nothrow();
   if (result.exitCode !== 0) {
-    console.error(`[${demo.id}] failed (exit ${result.exitCode})`);
+    warn(
+      `record ${demo.id}`,
+      `recording failed (exit ${result.exitCode}); kept the committed cast`,
+    );
     failed++;
   }
 }
-if (failed > 0) process.exit(1);
+if (failed > 0) {
+  warn("record", `${failed} demo(s) failed; their committed cast kept`);
+  if (!values["warn-only"]) process.exit(1);
+}

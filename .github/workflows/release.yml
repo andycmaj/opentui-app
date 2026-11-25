@@ -70,6 +70,10 @@ jobs:
   publish:
     needs: version
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      # To start the site build below.
+      actions: write
     steps:
       - uses: actions/checkout@v5
         with:
@@ -100,3 +104,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release edit "${{ needs.version.outputs.tag }}" --draft=false
+
+      # Rebuild the site so its changelog and API reference show this release.
+      # A GITHUB_TOKEN push doesn't trigger site.yml, but a dispatch does.
+      - name: Rebuild the site
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run site.yml --ref main -R "${{ github.repository }}"
