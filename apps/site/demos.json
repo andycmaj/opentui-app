@@ -1,5 +1,5 @@
 {
-  "$comment": "Recorded demos. `repo` is checked out next to this repo (or passed with --path id=dir); `keys` is relative to that checkout. Recorded by scripts/record-all.ts. `keymap` (apps only) is the module exporting `keymap`, read by scripts/extract-keymaps.ts.",
+  "$comment": "Recorded demos. `repo` is checked out next to this repo (or passed with --path id=dir); `keys` and `entry` (default ./src/index.tsx; relative to `cwd`) are relative to that checkout. Recorded by scripts/record-all.ts. `keymap` (apps only) is the module exporting `keymap`, read by scripts/extract-keymaps.ts.",
   "demos": [
     {
       "id": "tilt-tui",
@@ -27,6 +27,16 @@
         "KUBE_TUI_FIXTURE": "default"
       },
       "keymap": "src/keymap.ts"
+    },
+    {
+      "id": "riker",
+      "repo": "andycmaj/riker",
+      "entry": "packages/cli/src/riker.ts",
+      "keys": "demo/demo.keys",
+      "env": {
+        "RIKER_FIXTURE": "demo"
+      },
+      "keymap": "packages/tui/src/keymap.ts"
     },
     {
       "id": "keymaps",
