@@ -41,7 +41,7 @@ the build plan.
 ## Status (2026-11-25)
 
 All eight phases are built; nothing is deployed yet. How to deploy, and the
-setup only the owner can do (enable Pages, `SITE_DISPATCH_TOKEN` secrets), is
+setup only the owner can do (enable Pages, the site dispatch GitHub App), is
 in [`apps/site/README.md`](../../apps/site/README.md).
 
 Settled in the 2026-11-25 grilling, changing Phase 8:
@@ -52,8 +52,9 @@ Settled in the 2026-11-25 grilling, changing Phase 8:
   Casts and keymap JSON therefore stay committed as the fallback.
 - Recording needs no tmux/asciinema install (Bun PTY, see Phase 5), so CI
   installs only Bun.
-- App release workflows send `app-released` with a `SITE_DISPATCH_TOKEN`
-  secret, skipped while unset. This repo's `release.yml` starts `site.yml`
+- App release workflows send `app-released`, skipped until set up. (First a
+  `SITE_DISPATCH_TOKEN` PAT; since RIKER-0267 a GitHub App installation token,
+  see `apps/site/README.md`.) This repo's `release.yml` starts `site.yml`
   itself (`workflow_dispatch`), since its `GITHUB_TOKEN` push can't.
 
 The apps' fixture modes and key scripts are on `site-demo` branches in each
@@ -164,7 +165,7 @@ Verify: tables match each app's `?` help screen.
    keymaps → TypeDoc → `astro build` → Pagefind → deploy via
    `actions/deploy-pages`.
 2. Each app's release workflow: add a step sending `repository_dispatch` to
-   `andycmaj/opentui-app` (needs a fine-grained PAT secret).
+   `andycmaj/opentui-app` (authenticated as a GitHub App, see `apps/site/README.md`).
 3. Enable Pages (source: GitHub Actions).
 
 Verify: manual `workflow_dispatch` deploys; site live at Pages URL.

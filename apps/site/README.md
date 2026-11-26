@@ -64,19 +64,52 @@ and deploys with `actions/deploy-pages`.
 
 ### App release notifications
 
-For an app release to rebuild the site right away (instead of at the nightly
-run), each app repo needs a `SITE_DISPATCH_TOKEN` secret: a fine-grained PAT
-whose only access is **Contents: read and write** on `andycmaj/opentui-app`
-(that is what the dispatches API requires). One token can serve all three
-apps:
+An app release rebuilds the site right away (instead of at the nightly run)
+by sending `repository_dispatch` `app-released` with `{app, version}` from
+the last steps of its release workflow (`riker-release.yml`,
+`ghdash-release.yml`, `kube-tui-release.yml`, `tilt-tui-release.yml`). They
+authenticate as a GitHub App, not a PAT: `actions/create-github-app-token`
+mints an installation token that lasts an hour and reaches only this repo,
+and nothing needs renewing. (A PAT with Contents write here could also push
+code, and copied into four repos it would be four ways to leak.)
+
+This repo's own `release.yml` needs none of this: it starts `site.yml` with
+its `GITHUB_TOKEN` (`gh workflow run`).
+
+One-time setup, which only the owner can do. The wizard walks through it,
+pipes the key from the downloaded file into `gh secret set` (never shown or
+pasted), and checks the result by minting and revoking a token:
 
 ```sh
-for app in tilt-tui ghdash kube-tui; do
-  gh secret set SITE_DISPATCH_TOKEN -R andycmaj/$app   # paste the token
-done
+apps/site/scripts/setup-dispatch-app.sh
 ```
 
-The step is skipped while the secret is unset.
+What it sets up, if you'd rather do it by hand:
+
+1. **Create the App** at <https://github.com/settings/apps/new>:
+   name `opentui-site-dispatch`, homepage
+   `https://andycmaj.github.io/opentui-app/`, **Webhook: Active unchecked**,
+   **Repository permissions: Contents = Read and write** (Metadata read-only
+   comes with it; nothing else), **Only on this account**.
+2. **Generate a private key** (App page → Private keys). The browser
+   downloads a `.pem`.
+3. **Install** it (App page → Install App) on `andycmaj` with **Only select
+   repositories → `opentui-app`**.
+4. **On each app repo** (`riker`, `ghdash`, `kube-tui`, `tilt-tui`), set the
+   App's **Client ID** (`Iv…`, on the App page; not the numeric App ID) and
+   key:
+   ```sh
+   for app in riker ghdash kube-tui tilt-tui; do
+     gh variable set SITE_APP_CLIENT_ID -R andycmaj/$app --body "Iv…"
+     gh secret set SITE_APP_KEY -R andycmaj/$app < ~/Downloads/opentui-site-dispatch.*.private-key.pem
+   done
+   ```
+5. Delete the `.pem`, any leftover `SITE_DISPATCH_TOKEN` secrets, and the PAT
+   if one was made.
+
+Until both `SITE_APP_CLIENT_ID` and `SITE_APP_KEY` are set, the release logs a
+"Website not notified" notice and skips the dispatch; the nightly run picks
+the release up.
 
 CI records each app at its **latest release**, so an app's demo is only
 re-recorded once a release contains its fixture mode and `demo/demo.keys`.
