@@ -1,0 +1,33 @@
+---
+// A still from an app, served from public/screens/. The casts show apps in
+// motion; these show a single screen, with a caption saying what it is.
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+const { src, alt, caption } = Astro.props;
+const url = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/screens/${src}`;
+---
+
+<figure>
+  <img src={url} alt={alt} loading="lazy" decoding="async" />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  figure {
+    margin: var(--row) 0;
+  }
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--border-subtle);
+  }
+  figcaption {
+    margin-top: calc(var(--row) * 0.25);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+</style>
