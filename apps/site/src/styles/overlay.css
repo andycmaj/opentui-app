@@ -171,16 +171,14 @@
   display: none;
 }
 
-/* Home hero: half the page, centered, so the gallery shows above the fold.
-   Narrow screens keep the full width; half of a phone is unreadable. */
+/* Heroes (home reel, app page demo): the recording scales to its width, so a
+   full-width hero is taller than the screen. Half the page, never narrower
+   than 45rem so the terminal text stays legible, and never wider than the
+   page, so phones keep the full width. Centered with room above and below so
+   the content under it shows above the fold. */
 .pane.hero {
-  width: 50%;
-  margin-inline: auto;
-}
-@media (max-width: 1100px) {
-  .pane.hero {
-    width: 100%;
-  }
+  width: min(100%, max(50%, 45rem));
+  margin: var(--row) auto calc(var(--row) * 2);
 }
 
 /* Home hero: the reel's title bar reads like a PaneHeader. */
