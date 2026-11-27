@@ -23,6 +23,10 @@ the anonymous rate limit.
 tables in `src/data/keymaps/`, and both are committed: CI regenerates them on
 every deploy, and keeps the committed copy for any demo that fails.
 
+Still screenshots live in `public/screens/<app>/` and an app page shows them
+with `<Screenshot>`. CI doesn't regenerate them, so retake them by hand when
+the app's screens change.
+
 Each app needs a fixture mode (an env var, set in `demos.json`) and a key
 script (`demo/demo.keys`) in its own repo. To re-record locally, with the apps
 checked out next to this repo (or pointed at with `--path`):

@@ -1,11 +1,12 @@
 ---
 name: tilt-tui
-pitch: A terminal UI for Tilt, with vim-like navigation.
+pitch: A terminal UI for Tilt, with vim-like navigation. It starts tilt for you, or attaches to one already running.
 status: stable
 order: 1
 repo: https://github.com/andycmaj/tilt-tui
 requires:
-  - A running `tilt` process
+  - The `tilt` CLI on your `PATH` (or `tiltBinaryPath` in the config)
+  - "Nothing else running: `tilt-tui up` starts tilt itself, and plain `tilt-tui` attaches to a tilt you started"
 configPath: ~/.config/tilt-tui/config.json
 keymapScopes:
   - { id: app, title: "Global" }
@@ -14,18 +15,89 @@ keymapScopes:
 ---
 
 import Keybindings from "../../components/Keybindings.astro";
+import Screenshot from "../../components/Screenshot.astro";
+
+## Usage
+
+```sh
+tilt-tui up                         # start `tilt up` and open the TUI
+tilt-tui up -f deploy/Tiltfile api web   # args after `up` go to `tilt up` as-is
+tilt-tui                            # attach to a running tilt on port 10350
+TILT_PORT=10351 tilt-tui            # attach to one on another port
+tilt-tui logs api -f                # follow one resource's logs, no UI
+```
+
+- **`tilt-tui up`** runs `tilt up` as a child process and passes every
+  argument through. It won't start over a tilt (or anything else) already on
+  that port, shows tilt's error if tilt fails to start, and stops tilt when
+  you quit.
+- **`tilt-tui`** attaches to a tilt you started; quitting leaves it running.
+- **`tilt-tui logs [resource] [-f]`** prints logs to stdout for `grep` or a
+  file.
 
 ## Features
 
-- **Resource tree** of everything Tilt manages, grouped like the Tilt web UI,
-  with live status dots.
-- **Status filter** (`f`) cycles failed / in progress / successful / all, and
-  the **resource picker** (`space`) jumps to any resource by name.
-- **Log view** for the selected resource: search with `/`, toggle timestamps
-  with `t`, autoscroll with `s`.
-- **Actions** from the keyboard: trigger a reload (`r`), enable or disable a
-  resource (`ctrl+d`), inspect a resource (`i`) or the Tilt engine (`w`).
-- **Self-updating**: notices new releases and offers to install them.
+- **Resource tree** of everything Tilt manages, grouped by Tiltfile label like
+  the Tilt web UI, with runtime and build status, build times, and which
+  resource a waiting one is blocked on. `e` / `c` expand or collapse every
+  group, `d` shows or hides disabled resources, and `ctrl+e` hides the tree.
+- **Status filter**: `f` cycles all, healthy, unhealthy, building and pending;
+  `esc` resets it.
+- **Live logs** for the selected resource: `s` autoscroll, `t` timestamps.
+- **Log search**: `/` keeps only matching lines, by plain text or
+  `/regex/`, with a match count.
+- **Resource picker**: `space` fuzzy-finds any resource and jumps to its logs.
+- **Actions**: `r` triggers a rebuild, `ctrl+d` disables or enables a
+  resource.
+- **Command palette** (`:` or `ctrl+p`): the resource's endpoint links, its
+  Tilt buttons and global buttons, and every key's command. Buttons with
+  inputs open a form first.
+- **Resource info** (`i`): the selected resource's dependency tree, with live
+  status. **Watcher info** (`w`): Tilt's file watches, filterable.
+- **Self-updating**: checks GitHub for a new release at startup; click the
+  footer notice to update with mise.
+
+<Screenshot
+  src="tilt-tui/failed-build.png"
+  alt="tilt-tui with a failed storybook build selected: the tree marks it red and the log pane shows the module-not-found error"
+  caption="A failed build: red in the tree, its error in the logs."
+/>
+
+<Screenshot
+  src="tilt-tui/log-search.png"
+  alt="The api resource's logs filtered to the two lines containing GET, with [/GET/: 2 matches] in the header"
+  caption="Log search: / filters the log to matching lines."
+/>
+
+<Screenshot
+  src="tilt-tui/picker.png"
+  alt="The resource picker modal, filtered by the letter a, listing resources grouped by label"
+  caption="The resource picker (space), grouped like the tree."
+/>
+
+<Screenshot
+  src="tilt-tui/palette.png"
+  alt="The command palette listing a localhost:8080 link, the api resource's Disable Resource, Stop Build and Seed data buttons, and tree commands"
+  caption="The command palette: links, Tilt buttons, and commands."
+/>
+
+<Screenshot
+  src="tilt-tui/button-form.png"
+  alt="A form for the Seed data button with a COUNT field set to 100"
+  caption="A Tilt button with inputs opens a form before it runs."
+/>
+
+<Screenshot
+  src="tilt-tui/resource-info.png"
+  alt="Resource info for api: a dependency tree of migrations, postgres and redis, each with a green status dot"
+  caption="Resource info (i): the dependency tree, with live status."
+/>
+
+<Screenshot
+  src="tilt-tui/status-filter.png"
+  alt="The tree filtered to unhealthy resources, showing only storybook"
+  caption="The status filter (f), here on unhealthy."
+/>
 
 ## Keys
 
@@ -34,14 +106,12 @@ import Keybindings from "../../components/Keybindings.astro";
 ## Configuration
 
 Settings live in `~/.config/tilt-tui/config.json` and are read at startup.
-
-### Log filters
-
-Hide noisy log lines with named groups of regex patterns. Active filters are
-listed in the log view header.
+Every key is optional.
 
 ```json
 {
+  "theme": "tokyo-night",
+  "tiltBinaryPath": "/opt/homebrew/bin/tilt",
   "logFilters": {
     "health-checks": ["GET /health", "GET /readiness"],
     "debug-logs": ["^DEBUG:", "\\[debug\\]"]
@@ -49,10 +119,13 @@ listed in the log view header.
 }
 ```
 
-### Theme
+- **`theme`**: `default`, `tokyo-night`, `terminal` (your terminal's colors,
+  with accents for status) or `mono` (no color). `terminal` and `mono` follow
+  a light or dark terminal.
+- **`tiltBinaryPath`**: the `tilt` to run, as a path or command name, instead
+  of the one on your `PATH`.
+- **`logFilters`**: named groups of regular expressions. Matching log lines
+  are hidden, and the log header lists the active filters.
 
-```json
-{ "theme": "terminal" }
-```
-
-One of `default`, `tokyo-night`, `terminal`, or `mono`.
+Set `GITHUB_TOKEN` or `GH_TOKEN` to avoid GitHub's anonymous rate limit on the
+update check.
